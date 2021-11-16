@@ -1,6 +1,6 @@
-<img src="https://user-images.githubusercontent.com/21299899/139456439-c0c0356f-afa3-4eb5-a5b6-c4a0bbe3f303.png" width="400px">
+<img src="https://user-images.githubusercontent.com/21299899/142083327-cd45a119-2d2b-4cec-b0d3-4b57d843877f.png" width="400px">
 
-ORM for Cloud Spanner 🔧 to boost your productivity.
+ORM for Cloud Spanner to boost your productivity
 
 ## How spnr ORM looks like?
 Here's the exmaple code 👇 
