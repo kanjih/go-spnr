@@ -1,0 +1,53 @@
+run:
+  skip-dirs:
+    - .github/
+  skip-files:
+    - .gitignore
+    - .go-version
+    - .golangci.yml
+    - go.mod
+    - go.sum
+linters:
+  disable-all: true
+  enable:
+    - staticcheck
+    - errcheck
+    - gosimple
+    - govet
+    - ineffassign
+    - unused
+    - varcheck
+    - bodyclose
+    - errorlint
+    - godox
+    - gomnd
+    - goprintffuncname
+    - gosec
+    - nakedret
+    - nestif
+    - unconvert
+    - wastedassign
+
+linters-settings:
+  staticcheck:
+    go: "1.16.6"
+    checks: ["all"]
+  gosimple:
+    go: "1.16.6"
+    checks: ["all"]
+  govet:
+    check-shadowing: true
+  unused:
+    go: "1.16.6"
+  errorlint:
+    errorf: true
+    asserts: true
+    comparison: true
+  gomnd:
+    settings:
+      mnd:
+        # the list of enabled checks, see https://github.com/tommy-muehle/go-mnd/#checks for description.
+        checks: argument,case,condition,operation,return,assign
+  nakedret:
+    # make an issue if func has more lines of code than this setting and it has naked returns; default is 30
+    max-func-lines: 30

@@ -1,0 +1,65 @@
+name: PR-Reviewer
+
+on:
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Dependency
+        run: sudo apt update && sudo apt install -y gcc
+  build:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Go 1.16.6
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.16.6
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+      - name: go mod download
+        run: go mod download
+      - name: build
+        run: go build ./...
+      - name: prepare test
+        run: go get github.com/docker/docker/pkg/system@v20.10.7+incompatible
+      - name: test
+        run: go test ./... 
+  formatting:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Go 1.16.6
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.16.6
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.ref }} # PRを作ったbranch名
+      - name: go fmt
+        run: go fmt ./...
+      - name: commit & push when file is changed
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add -A
+          git commit -m "Formatting by github actions" && git push ${REPO} HEAD:${{ github.event.pull_request.head.ref }} || true
+  glangci_lint:
+    needs: formatting
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+      - name: Code Review by golangci-lint
+        uses: reviewdog/action-golangci-lint@v2
+        with:
+          golangci_lint_flags: "--config=.golangci.yml"
+          filter_mode: nofilter
+          cache: false
+          level: warning
+          reporter: github-pr-review
