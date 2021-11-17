@@ -42,6 +42,7 @@ func (m *Mutation) Reader(ctx context.Context, tx Transaction) *Reader {
 	return &Reader{table: m.table, ctx: ctx, tx: tx, logger: m.logger, logEnabled: m.logEnabled}
 }
 
+// GetTableName returns table name
 func (m *Mutation) GetTableName() string {
 	return m.table
 }
