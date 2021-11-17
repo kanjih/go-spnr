@@ -45,6 +45,9 @@ import (
 )
 
 type Singer struct {
+	// spnr supports 2 types of tags.
+	// - spanner: spanner column name
+	// - pk: primary key order
 	SingerID string `spanner:"SingerId" pk:"1"`
 	Name     string `spanner:"Name"`
 }
