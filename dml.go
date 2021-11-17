@@ -43,6 +43,10 @@ func (d *DML) Reader(ctx context.Context, tx Transaction) *Reader {
 	return &Reader{table: d.table, ctx: ctx, tx: tx, logger: d.logger, logEnabled: d.logEnabled}
 }
 
+func (d *DML) GetTableName() string {
+	return d.table
+}
+
 func (d *DML) getTableName() string {
 	return quote(d.table)
 }

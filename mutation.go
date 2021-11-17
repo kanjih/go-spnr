@@ -42,6 +42,10 @@ func (m *Mutation) Reader(ctx context.Context, tx Transaction) *Reader {
 	return &Reader{table: m.table, ctx: ctx, tx: tx, logger: m.logger, logEnabled: m.logEnabled}
 }
 
+func (m *Mutation) GetTableName() string {
+	return m.table
+}
+
 func (m *Mutation) log(format string, v ...interface{}) {
 	if m.logEnabled {
 		m.logger.Printf(format, v...)
