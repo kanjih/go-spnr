@@ -49,12 +49,8 @@ spnr is desined
 - 🙆‍♂️ for reducing boliderplate codes (mapping selected records to struct or write simple insert/update/delete operations)
 - 🙅‍♀️ not for hiding queries executed in background (spnr doesn't support abstractions for complicated operations)
 
-## Installation
-```
-go get github.com/kanjih/go-spnr
-```
-
 ## Table of contents
+- [Installation](#installation)
 - spnr APIs
   - [Read operations](#read-operations)
   - [Mutation API](#mutation-api)
@@ -62,6 +58,11 @@ go get github.com/kanjih/go-spnr
 - [Embedding](#embedding)
 - [Code generation](#code-generation)
 - [Helper functions](#helper-functions)
+
+## Installation
+```
+go get github.com/kanjih/go-spnr
+```
 
 ## Read operations
 spnr provides the following types of read operations 💪
