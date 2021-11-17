@@ -45,6 +45,10 @@ func main(ctx context.Context, client *spanner.Client) {
 - Supports code generation to map records
 - Supports raw SQLs for not simple cases
 
+spnr is desined
+- 🙆‍♂️ for reducing boliderplate codes (mapping selected records to struct or write simple insert/update/delete operations)
+- 🙅‍♀️ not for hiding queries executed in background (spnr doesn't support abstractions for complicated operations)
+
 ## Installation
 ```
 go get github.com/kanjih/go-spnr
