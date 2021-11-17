@@ -34,6 +34,20 @@ type Reader struct {
 	logEnabled bool
 }
 
+func (r *Reader) getTableName(target interface{}) string {
+	if r.table != "" {
+		return r.table
+	}
+	return getTableName(reflect.ValueOf(target))
+}
+
+func (r *Reader) getTableNameFromInnerType(innerType reflect.Type) string {
+	if r.table != "" {
+		return r.table
+	}
+	return convertToTableName(innerType.Name())
+}
+
 func (r *Reader) log(format string, v ...interface{}) {
 	if !r.logEnabled {
 		return

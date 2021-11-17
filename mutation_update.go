@@ -70,6 +70,7 @@ func (m *Mutation) ApplyUpdateColumns(ctx context.Context, client *spanner.Clien
 }
 
 func (m *Mutation) buildUpdate(targets []interface{}) []*spanner.Mutation {
+	table := m.getTableName(targets[0])
 	var ms []*spanner.Mutation
 	for _, target := range targets {
 		var columns []string
@@ -78,13 +79,14 @@ func (m *Mutation) buildUpdate(targets []interface{}) []*spanner.Mutation {
 			columns = append(columns, field.name)
 			values = append(values, field.value)
 		}
-		m.log("Update %s, columns=%+v, values=%+v", m.table, columns, values)
-		ms = append(ms, spanner.Update(m.table, columns, values))
+		m.log("Update %s, columns=%+v, values=%+v", table, columns, values)
+		ms = append(ms, spanner.Update(table, columns, values))
 	}
 	return ms
 }
 
 func (m *Mutation) buildUpdateWithColumns(targets []interface{}, columns []string) []*spanner.Mutation {
+	table := m.getTableName(targets[0])
 	var ms []*spanner.Mutation
 	for _, target := range targets {
 		fieldNameField := map[string]field{}
@@ -95,8 +97,8 @@ func (m *Mutation) buildUpdateWithColumns(targets []interface{}, columns []strin
 		for _, c := range columns {
 			values = append(values, fieldNameField[c])
 		}
-		m.log("Update %s, columns=%+v, values=%+v", m.table, columns, values)
-		ms = append(ms, spanner.Update(m.table, columns, values))
+		m.log("Update %s, columns=%+v, values=%+v", table, columns, values)
+		ms = append(ms, spanner.Update(table, columns, values))
 	}
 	return ms
 }

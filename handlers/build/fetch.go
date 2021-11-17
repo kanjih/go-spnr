@@ -70,7 +70,7 @@ func fetchColumns(ctx context.Context, projectId, instanceName, dbName string) (
 func fetchColumnRecords(ctx context.Context, client *spanner.Client) (map[string][]columnRecord, error) {
 	q := "select TABLE_NAME, COLUMN_NAME, IS_NULLABLE, SPANNER_TYPE from information_schema.columns where TABLE_SCHEMA = '' order by ORDINAL_POSITION"
 	var columns []columnRecord
-	if err := spnr.New("").Reader(ctx, client.Single()).Query(q, nil, &columns); err != nil {
+	if err := spnr.New().Reader(ctx, client.Single()).Query(q, nil, &columns); err != nil {
 		return nil, err
 	}
 	res := map[string][]columnRecord{}
@@ -88,7 +88,7 @@ func fetchColumnRecords(ctx context.Context, client *spanner.Client) (map[string
 func fetchPrimaryKeys(ctx context.Context, client *spanner.Client) (map[string]map[string]int64, error) {
 	q := "select TABLE_NAME, COLUMN_NAME, ORDINAL_POSITION from information_schema.INDEX_COLUMNS where TABLE_SCHEMA = '' and INDEX_NAME = 'PRIMARY_KEY'"
 	var columns []indexColumnRecord
-	if err := spnr.New("").Reader(ctx, client.Single()).Query(q, nil, &columns); err != nil {
+	if err := spnr.New().Reader(ctx, client.Single()).Query(q, nil, &columns); err != nil {
 		return nil, err
 	}
 	res := map[string]map[string]int64{}

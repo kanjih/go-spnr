@@ -35,7 +35,7 @@ var (
 func TestLooksLike(t *testing.T) {
 	singer := &Singer{SingerID: "a", Name: "Alice"}
 	ctx := context.Background()
-	singerStore := spnr.New("Singers")
+	singerStore := spnr.NewMutationWithOptions(&spnr.Options{TableName: "Singers"})
 	_, err := singerStore.ApplyInsertOrUpdate(ctx, client, singer)
 	assert.NilError(t, err)
 
@@ -57,7 +57,7 @@ func TestLooksLike(t *testing.T) {
 
 func TestExample(t *testing.T) {
 	ctx := context.Background()
-	singerStore := spnr.New("Singers")
+	singerStore := spnr.NewMutationWithOptions(&spnr.Options{TableName: "Singers"})
 	_, err := singerStore.ApplyInsertOrUpdate(ctx, client, &Singer{"a", "Alice"})
 	assert.NilError(t, err)
 
@@ -71,7 +71,7 @@ func TestExample(t *testing.T) {
 
 func TestSelectRecordsUsingPrimaryKeys(t *testing.T) {
 	ctx := context.Background()
-	singerStore := spnr.New("Singers")
+	singerStore := spnr.NewMutationWithOptions(&spnr.Options{TableName: "Singers"})
 	_, err := singerStore.ApplyInsertOrUpdate(ctx, client, singer)
 	assert.NilError(t, err)
 	_, err = singerStore.ApplyInsertOrUpdate(ctx, client, &singers)
@@ -90,12 +90,12 @@ func TestSelectRecordsUsingPrimaryKeys(t *testing.T) {
 	assert.Equal(t, singers[0], fetchedSingers[1])
 
 	var name string
-	err = singerStore.Reader(ctx, client.Single()).GetColumn(spanner.Key{"a"}, "Name", &name)
+	err = singerStore.Reader(ctx, client.Single()).FindColumnsOne(spanner.Key{"a"}, "Name", &name)
 	assert.NilError(t, err)
 	assert.Equal(t, singer.Name, name)
 
 	var names []string
-	err = singerStore.Reader(ctx, client.Single()).GetColumnAll(keys, "Name", &names)
+	err = singerStore.Reader(ctx, client.Single()).FindColumnsAll(keys, "Name", &names)
 	assert.NilError(t, err)
 	assert.Equal(t, singer.Name, names[0])
 	assert.Equal(t, singers[0].Name, names[1])
@@ -110,7 +110,7 @@ func TestSelectMultipleColumnsUsingPrimaryKeys(t *testing.T) {
 		AlbumID:  1,
 		Title:    spnr.NewNullString("test"),
 	}
-	albumStore := spnr.NewMutationWithOptions("Albums", &spnr.Options{LogEnabled: true})
+	albumStore := spnr.NewMutationWithOptions(&spnr.Options{TableName: "Albums", LogEnabled: true})
 	_, err := albumStore.ApplyInsertOrUpdate(ctx, client, album)
 	assert.NilError(t, err)
 
@@ -127,7 +127,7 @@ func TestSelectMultipleColumnsUsingPrimaryKeys(t *testing.T) {
 
 func TestSelectRecordsUsingQuery(t *testing.T) {
 	ctx := context.Background()
-	singerStore := spnr.New("Singers")
+	singerStore := spnr.NewMutationWithOptions(&spnr.Options{TableName: "Singers"})
 	_, err := singerStore.ApplyInsertOrUpdate(ctx, client, singer)
 	assert.NilError(t, err)
 	_, err = singerStore.ApplyInsertOrUpdate(ctx, client, &singers)
@@ -153,7 +153,7 @@ func TestSelectRecordsUsingQuery(t *testing.T) {
 
 func TestSelectOneValueUsingQuery(t *testing.T) {
 	ctx := context.Background()
-	singerStore := spnr.New("Singers")
+	singerStore := spnr.NewMutationWithOptions(&spnr.Options{TableName: "Singers"})
 	_, err := singerStore.ApplyInsertOrUpdate(ctx, client, &singers)
 	assert.NilError(t, err)
 
@@ -168,7 +168,7 @@ func TestSelectOneValueUsingQuery(t *testing.T) {
 
 func TestMutationAPI(t *testing.T) {
 	ctx := context.Background()
-	singerStore := spnr.New("Singers")
+	singerStore := spnr.NewMutationWithOptions(&spnr.Options{TableName: "Singers"})
 
 	client.ReadWriteTransaction(ctx, func(ctx context.Context, tx *spanner.ReadWriteTransaction) error {
 		err := singerStore.InsertOrUpdate(tx, singer)
@@ -255,7 +255,7 @@ func TestMutationAPI(t *testing.T) {
 }
 
 func TestDML(t *testing.T) {
-	singerStore := spnr.NewDMLWithOptions("Singers", &spnr.Options{LogEnabled: true})
+	singerStore := spnr.NewDMLWithOptions(&spnr.Options{TableName: "Singers", LogEnabled: true})
 	client.ReadWriteTransaction(context.Background(), func(ctx context.Context, tx *spanner.ReadWriteTransaction) error {
 		_, err := singerStore.Insert(ctx, tx, singer)
 		assert.NilError(t, err)

@@ -37,7 +37,7 @@ func (d *DML) buildInsertStmt(target interface{}) *spanner.Statement {
 	}
 
 	sql := fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s)",
-		d.getTableName(),
+		d.getTableName(target),
 		strings.Join(columns, ", "),
 		strings.Join(values, ", "),
 	)
@@ -55,6 +55,7 @@ func (d *DML) buildInsertAllStmt(target interface{}) *spanner.Statement {
 	params := map[string]interface{}{}
 
 	slice := reflect.ValueOf(target).Elem()
+	table := d.getTableNameFromVal(slice.Index(0))
 	for i := 0; i < slice.Len(); i++ {
 		var values []string
 		for _, field := range structValToFields(slice.Index(i)) {
@@ -69,7 +70,7 @@ func (d *DML) buildInsertAllStmt(target interface{}) *spanner.Statement {
 	}
 
 	sql := fmt.Sprintf("INSERT INTO %s (%s) VALUES %s",
-		d.getTableName(),
+		table,
 		strings.Join(columns, ", "),
 		strings.Join(valuesList, ", "),
 	)

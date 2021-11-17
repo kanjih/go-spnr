@@ -25,50 +25,50 @@ type Singer struct {
 
 func looksLike(ctx context.Context, client *spanner.Client) {
 	// initialize
-	singerStore := spnr.New("Singers") // specify table name
+	store := spnr.New()
 
 	// save record (spnr provides many other functions for Mutation API & DML!)
-	singerStore.ApplyInsertOrUpdate(ctx, client, &Singer{SingerID: "a", Name: "Alice"})
+	store.ApplyInsertOrUpdate(ctx, client, &Singer{SingerID: "a", Name: "Alice"})
 
 	// fetch record
 	var singer Singer
-	singerStore.Reader(ctx, client.Single()).FindOne(spanner.Key{"a"}, &singer)
+	store.Reader(ctx, client.Single()).FindOne(spanner.Key{"a"}, &singer)
 
 	// fetch record using raw query
 	var singers []Singer
 	query := "select * from Singers where SingerId=@singerId"
 	params := map[string]interface{}{"singerId": "a"}
-	singerStore.Reader(ctx, client.Single()).Query(query, params, &singers)
+	store.Reader(ctx, client.Single()).Query(query, params, &singers)
 }
 
 func example(ctx context.Context, client *spanner.Client) {
 	// initialize
-	singerStore := spnr.New("Singers")
+	store := spnr.New()
 
 	// save record
-	singerStore.ApplyInsertOrUpdate(ctx, client, &Singer{"a", "Alice"})
+	store.ApplyInsertOrUpdate(ctx, client, &Singer{"a", "Alice"})
 
 	// fetch record
 	var singer Singer
-	singerStore.Reader(ctx, client.Single()).FindOne(spanner.Key{"a"}, &singer)
+	store.Reader(ctx, client.Single()).FindOne(spanner.Key{"a"}, &singer)
 }
 
-func selectRecordsUsingPrimaryKeys(ctx context.Context, tx spnr.Transaction, singerStore *spnr.Mutation) {
+func selectRecordsUsingPrimaryKeys(ctx context.Context, tx spnr.Transaction, store *spnr.Mutation) {
 	var singer Singer
-	singerStore.Reader(ctx, tx).FindOne(spanner.Key{"a"}, &singer)
+	store.Reader(ctx, tx).FindOne(spanner.Key{"a"}, &singer)
 
 	var singers []Singer
 	keys := spanner.KeySetFromKeys(spanner.Key{"a"}, spanner.Key{"b"})
-	singerStore.Reader(ctx, tx).FindAll(keys, &singers)
+	store.Reader(ctx, tx).FindAll(keys, &singers)
 }
 
-func selectOneColumnUsingPrimaryKeys(ctx context.Context, tx spnr.Transaction, singerStore *spnr.Mutation) {
+func selectOneColumnUsingPrimaryKeys(ctx context.Context, tx spnr.Transaction, store *spnr.Mutation) {
 	var name string
-	singerStore.Reader(ctx, tx).GetColumn(spanner.Key{"a"}, "Name", &name)
+	store.Reader(ctx, tx).FindColumnsOne(spanner.Key{"a"}, "Name", &name)
 
 	var names []string
 	keys := spanner.KeySetFromKeys(spanner.Key{"a"}, spanner.Key{"b"})
-	singerStore.Reader(ctx, tx).GetColumnAll(keys, "Name", &names)
+	store.Reader(ctx, tx).FindColumnsAll(keys, "Name", &names)
 }
 
 type Album struct {
@@ -77,75 +77,75 @@ type Album struct {
 	Title    spanner.NullString `spanner:"Title"`
 }
 
-func selectMultipleColumnsUsingPrimaryKeys(ctx context.Context, tx spnr.Transaction, albumStore *spnr.Mutation) {
+func selectMultipleColumnsUsingPrimaryKeys(ctx context.Context, tx spnr.Transaction, store *spnr.Mutation) {
 	type cols struct {
 		AlbumID int64              `spanner:"AlbumId"`
 		Title   spanner.NullString `spanner:"Title"`
 	}
 	var res cols
-	albumStore.Reader(ctx, tx).FindOne(spanner.Key{1}, &res)
+	store.Reader(ctx, tx).FindOne(spanner.Key{1}, &res)
 }
 
-func selectRecordsUsingQuery(ctx context.Context, tx spnr.Transaction, singerStore *spnr.Mutation) {
+func selectRecordsUsingQuery(ctx context.Context, tx spnr.Transaction, store *spnr.Mutation) {
 	var singer Singer
 	query := "select * from `Singers` where SingerId=@singerId"
 	params := map[string]interface{}{"singerId": "a"}
-	singerStore.Reader(ctx, tx).QueryOne(query, params, &singer)
+	store.Reader(ctx, tx).QueryOne(query, params, &singer)
 
 	var singers []Singer
 	query = "select * from Singers"
-	singerStore.Reader(ctx, tx).Query(query, nil, &singers)
+	store.Reader(ctx, tx).Query(query, nil, &singers)
 }
 
-func selectOneValueUsingQuery(ctx context.Context, tx spnr.Transaction, singerStore *spnr.Mutation) {
+func selectOneValueUsingQuery(ctx context.Context, tx spnr.Transaction, store *spnr.Mutation) {
 	var cnt int64
 	query := "select count(*) as cnt from Singers"
-	singerStore.Reader(ctx, tx).QueryValue(query, nil, &cnt)
+	store.Reader(ctx, tx).QueryValue(query, nil, &cnt)
 }
 
 func mutationAPI(ctx context.Context, client *spanner.Client, tx *spanner.ReadWriteTransaction) {
 	singer := &Singer{SingerID: "a", Name: "Alice"}
 	singers := []Singer{{SingerID: "b", Name: "Bob"}, {SingerID: "c", Name: "Carol"}}
 
-	singerStore := spnr.New("Singers") // specify table name
+	store := spnr.NewMutationWithOptions(&spnr.Options{TableName: "Singers"}) // specify table name
 
-	singerStore.InsertOrUpdate(tx, singer)   // Insert or update
-	singerStore.InsertOrUpdate(tx, &singers) // Insert or update multiple records
+	store.InsertOrUpdate(tx, singer)   // Insert or update
+	store.InsertOrUpdate(tx, &singers) // Insert or update multiple records
 
-	singerStore.Update(tx, singer)   // Update
-	singerStore.Update(tx, &singers) // Update multple records
+	store.Update(tx, singer)   // Update
+	store.Update(tx, &singers) // Update multple records
 
-	singerStore.Delete(tx, singer)   // Delete
-	singerStore.Delete(tx, &singers) // Delete multiple records
+	store.Delete(tx, singer)   // Delete
+	store.Delete(tx, &singers) // Delete multiple records
 }
 
 func mutationAPIApply(ctx context.Context, client *spanner.Client) {
 	singer := &Singer{SingerID: "a", Name: "Alice"}
 
-	singerStore := spnr.New("Singers")
-	singerStore.ApplyInsertOrUpdate(ctx, client, singer)
+	store := spnr.NewMutationWithOptions(&spnr.Options{TableName: "Singers"})
+	store.ApplyInsertOrUpdate(ctx, client, singer)
 }
 
 func DML(ctx context.Context, client *spanner.Client, tx *spanner.ReadWriteTransaction) {
 	singer := &Singer{SingerID: "a", Name: "Alice"}
 	singers := []Singer{{SingerID: "b", Name: "Bob"}, {SingerID: "c", Name: "Carol"}}
 
-	singerStore := spnr.NewDML("Singers") // specify table name
+	store := spnr.NewDMLWithOptions(&spnr.Options{TableName: "Singers"}) // specify table name
 
-	singerStore.Insert(ctx, tx, singer)
+	store.Insert(ctx, tx, singer)
 	// -> INSERT INTO `Singers` (`SingerId`, `Name`) VALUES (@SingerId, @Name)
-	singerStore.Insert(ctx, tx, &singers)
+	store.Insert(ctx, tx, &singers)
 	// -> INSERT INTO `Singers` (`SingerId`, `Name`) VALUES (@SingerId_0, @Name_0), (@SingerId_1, @Name_1)
 
-	singerStore.Update(ctx, tx, singer)
+	store.Update(ctx, tx, singer)
 	// -> UPDATE `Singers` SET `Name`=@Name WHERE `SingerId`=@w_SingerId
-	singerStore.Update(ctx, tx, &singers)
+	store.Update(ctx, tx, &singers)
 	// -> UPDATE `Singers` SET `Name`=@Name WHERE `SingerId`=@w_SingerId
 	// -> UPDATE `Singers` SET `Name`=@Name WHERE `SingerId`=@w_SingerId
 
-	singerStore.Delete(ctx, tx, singer)
+	store.Delete(ctx, tx, singer)
 	// -> DELETE FROM `Singers` WHERE `SingerId`=@w_SingerId
-	singerStore.Delete(ctx, tx, &singers)
+	store.Delete(ctx, tx, &singers)
 	// -> DELETE FROM `Singers` WHERE (`SingerId`=@w_SingerId_0) OR (`SingerId`=@w_SingerId_1)
 }
 
@@ -155,7 +155,7 @@ type SingerStore struct {
 }
 
 func NewSingerStore() *SingerStore {
-	return &SingerStore{DML: *spnr.NewDML("Singers")}
+	return &SingerStore{DML: *spnr.NewDMLWithOptions(&spnr.Options{TableName: "Singers"})}
 }
 
 // Any methods you want to add
@@ -165,17 +165,17 @@ func (s *SingerStore) GetCount(ctx context.Context, tx spnr.Transaction, cnt int
 }
 
 func useSingerStore(ctx context.Context, client *spanner.Client) {
-	singerStore := NewSingerStore()
+	store := NewSingerStore()
 
 	client.ReadWriteTransaction(ctx, func(ctx context.Context, tx *spanner.ReadWriteTransaction) error {
 		// You can use all operations that spnr.DML has 
-		singerStore.Insert(ctx, tx, &Singer{SingerID: "a", Name: "Alice"})
+		store.Insert(ctx, tx, &Singer{SingerID: "a", Name: "Alice"})
 		var singer Singer
-		singerStore.Reader(ctx, tx).FindOne(spanner.Key{"a"}, &singer)
+		store.Reader(ctx, tx).FindOne(spanner.Key{"a"}, &singer)
 
 		// And you can use the methods you added !!
 		var cnt int
-		singerStore.GetCount(ctx, tx, &cnt)
+		store.GetCount(ctx, tx, &cnt)
 
 		return nil
 	})
