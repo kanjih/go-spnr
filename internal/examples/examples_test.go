@@ -32,7 +32,7 @@ var (
 	singers        = []Singer{{SingerID: "b", Name: "Bob"}, {SingerID: "c", Name: "Carol"}}
 )
 
-func TestLooksLike(t *testing.T) {
+func TestExample(t *testing.T) {
 	singer := &Singer{SingerID: "a", Name: "Alice"}
 	ctx := context.Background()
 	singerStore := spnr.New("Singers")
@@ -53,20 +53,6 @@ func TestLooksLike(t *testing.T) {
 	assert.Equal(t, *singer, singers[0])
 	assert.NilError(t, deleteAllSingers())
 
-}
-
-func TestExample(t *testing.T) {
-	ctx := context.Background()
-	singerStore := spnr.New("Singers")
-	_, err := singerStore.ApplyInsertOrUpdate(ctx, client, &Singer{"a", "Alice"})
-	assert.NilError(t, err)
-
-	var fetched Singer
-	err = singerStore.Reader(ctx, client.Single()).FindOne(spanner.Key{"a"}, &fetched)
-	assert.NilError(t, err)
-	assert.Equal(t, *singer, fetched)
-
-	assert.NilError(t, deleteAllSingers())
 }
 
 func TestSelectRecordsUsingPrimaryKeys(t *testing.T) {

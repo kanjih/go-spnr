@@ -19,15 +19,18 @@ const (
 )
 
 type Singer struct {
+	// spnr supports 2 types of tags.
+	// - spanner: spanner column name
+	// - pk: primary key order
 	SingerID string `spanner:"SingerId" pk:"1"`
 	Name     string `spanner:"Name"`
 }
 
-func looksLike(ctx context.Context, client *spanner.Client) {
+func example(ctx context.Context, client *spanner.Client) {
 	// initialize
 	singerStore := spnr.New("Singers") // specify table name
 
-	// save record (spnr provides many other functions for Mutation API & DML!)
+	// save record (spnr supports both Mutation API & DML!)
 	singerStore.ApplyInsertOrUpdate(ctx, client, &Singer{SingerID: "a", Name: "Alice"})
 
 	// fetch record
@@ -39,18 +42,6 @@ func looksLike(ctx context.Context, client *spanner.Client) {
 	query := "select * from Singers where SingerId=@singerId"
 	params := map[string]interface{}{"singerId": "a"}
 	singerStore.Reader(ctx, client.Single()).Query(query, params, &singers)
-}
-
-func example(ctx context.Context, client *spanner.Client) {
-	// initialize
-	singerStore := spnr.New("Singers")
-
-	// save record
-	singerStore.ApplyInsertOrUpdate(ctx, client, &Singer{"a", "Alice"})
-
-	// fetch record
-	var singer Singer
-	singerStore.Reader(ctx, client.Single()).FindOne(spanner.Key{"a"}, &singer)
 }
 
 func selectRecordsUsingPrimaryKeys(ctx context.Context, tx spnr.Transaction, singerStore *spnr.Mutation) {
