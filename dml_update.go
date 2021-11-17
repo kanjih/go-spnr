@@ -82,7 +82,7 @@ func (d *DML) buildUpdateStmt(target interface{}, columns []string) *spanner.Sta
 		params[k] = v
 	}
 	sql := fmt.Sprintf("UPDATE %s SET %s WHERE %s",
-		d.getTableName(),
+		d.getTableNameFromVal(reflect.ValueOf(target).Elem()),
 		setClause,
 		whereClause,
 	)

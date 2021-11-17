@@ -5,6 +5,7 @@ package spnr
 
 import (
 	"context"
+	"reflect"
 )
 
 // DML offers ORM with Mutation API.
@@ -16,21 +17,21 @@ type Mutation struct {
 }
 
 // New is alias for NewMutation.
-func New(tableName string) *Mutation {
-	return &Mutation{table: tableName}
+func New() *Mutation {
+	return NewMutation()
 }
 
 // NewMutation initializes ORM with Mutation API.
 // It also contains read operations (call Reader method of Mutation.)
 // If you want to use DML, use NewDML() instead.
-func NewMutation(tableName string) *Mutation {
-	return &Mutation{table: tableName}
+func NewMutation() *Mutation {
+	return &Mutation{}
 }
 
 // NewDMLWithOptions initializes Mutation with options.
 // Check Options for the available options.
-func NewMutationWithOptions(tableName string, op *Options) *Mutation {
-	m := &Mutation{table: tableName, logger: op.Logger, logEnabled: op.LogEnabled}
+func NewMutationWithOptions(op *Options) *Mutation {
+	m := &Mutation{table: op.TableName, logger: op.Logger, logEnabled: op.LogEnabled}
 	if m.logger == nil {
 		m.logger = newDefaultLogger()
 	}
@@ -40,6 +41,20 @@ func NewMutationWithOptions(tableName string, op *Options) *Mutation {
 // Reader returns Reader struct to call read operations.
 func (m *Mutation) Reader(ctx context.Context, tx Transaction) *Reader {
 	return &Reader{table: m.table, ctx: ctx, tx: tx, logger: m.logger, logEnabled: m.logEnabled}
+}
+
+func (m *Mutation) getTableName(target interface{}) string {
+	if m.table != "" {
+		return m.table
+	}
+	return getTableName(reflect.ValueOf(target))
+}
+
+func (m *Mutation) getTableNameFromVal(structVal reflect.Value) string {
+	if m.table != "" {
+		return m.table
+	}
+	return getTableName(structVal)
 }
 
 func (m *Mutation) log(format string, v ...interface{}) {

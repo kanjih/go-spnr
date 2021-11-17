@@ -7,13 +7,17 @@ import (
 )
 
 // FindOne fetches a record by specified primary key, and map the record into the passed pointer of struct.
-func (r *Reader) FindOne(key spanner.Key, target interface{}) error {
+func (r *Reader) FindOne(key spanner.Key, target interface{}, columns ...string) error {
 	if err := validateStructType(target); err != nil {
 		return err
 	}
-	r.log(readLogTemplate, "table:"+r.table, key)
+	table := r.getTableName(target)
+	r.log(readLogTemplate, "table:"+table, key)
 
-	row, err := r.tx.ReadRow(r.ctx, r.table, key, toColumnNames(reflect.ValueOf(target).Elem().Type()))
+	if len(columns) == 0 {
+		columns = toColumnNames(reflect.ValueOf(target).Elem().Type())
+	}
+	row, err := r.tx.ReadRow(r.ctx, table, key, columns)
 	if err != nil {
 		if isNotFound(err) {
 			return ErrNotFound
@@ -24,17 +28,22 @@ func (r *Reader) FindOne(key spanner.Key, target interface{}) error {
 }
 
 // FindAll fetches records by specified a set of primary keys, and map the records into the passed pointer of slice of structs.
-func (r *Reader) FindAll(keys spanner.KeySet, target interface{}) error {
+func (r *Reader) FindAll(keys spanner.KeySet, target interface{}, columns ...string) error {
 	if err := validateStructSliceType(target); err != nil {
 		return err
-	}
-	if r.logEnabled {
-		r.logger.Printf(readLogTemplate, "table:"+r.table, keys)
 	}
 	slice := reflect.ValueOf(target).Elem()
 	innerType := slice.Type().Elem()
 
-	rows := r.tx.Read(r.ctx, r.table, keys, toColumnNames(innerType))
+	table := r.getTableNameFromInnerType(innerType)
+	if r.logEnabled {
+		r.logger.Printf(readLogTemplate, "table:"+table, keys)
+	}
+
+	if len(columns) == 0 {
+		columns = toColumnNames(innerType)
+	}
+	rows := r.tx.Read(r.ctx, table, keys, toColumnNames(innerType))
 	defer rows.Stop()
 	for {
 		row, err := rows.Next()
@@ -82,7 +91,6 @@ func (r *Reader) GetColumnAll(keys spanner.KeySet, column string, target interfa
 	if err := validateSliceType(target); err != nil {
 		return err
 	}
-	r.log(readLogTemplate, "table:"+r.table, keys)
 	slice := reflect.ValueOf(target).Elem()
 	innerType := slice.Type().Elem()
 

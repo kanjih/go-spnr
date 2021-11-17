@@ -12,7 +12,7 @@ func TestQuery(t *testing.T) {
 	var fetched []Test
 	err := testRepository.
 		Reader(context.Background(), dataClient.Single()).
-		Query("select * from Test order by `String` asc", nil, &fetched)
+		Query("select * from `Tests` order by `String` asc", nil, &fetched)
 	assert.Nil(t, err)
 	assert.Len(t, fetched, 2)
 
@@ -32,7 +32,7 @@ func TestQueryOne(t *testing.T) {
 	params1 := map[string]interface{}{"string": testRecord1.String}
 	err := testRepository.
 		Reader(context.Background(), dataClient.Single()).
-		QueryOne("select * from Test where `String` = @string", params1, &fetched)
+		QueryOne("select * from `Tests` where `String` = @string", params1, &fetched)
 	assert.Nil(t, err)
 	assert.Equal(t, testRecord1.String, fetched.String)
 	assert.Equal(t, testRecord1.Bytes, fetched.Bytes)
@@ -48,7 +48,7 @@ func TestQueryOne(t *testing.T) {
 
 func TestQueryOneOrderChanged(t *testing.T) {
 	var fetched TestOrderChanged
-	query := fmt.Sprintf("select %s from Test where `String` = @string", ToAllColumnNames(&TestOrderChanged{}))
+	query := fmt.Sprintf("select %s from `Tests` where `String` = @string", ToAllColumnNames(&TestOrderChanged{}))
 	params1 := map[string]interface{}{"string": testRecord1.String}
 	err := testRepository.
 		Reader(context.Background(), dataClient.Single()).
@@ -70,7 +70,7 @@ func TestQueryAsFields(t *testing.T) {
 	var fetched []spanner.NullInt64
 	err := testRepository.
 		Reader(context.Background(), dataClient.Single()).
-		QueryValues("select NullInt64 from Test order by NullInt64 desc", nil, &fetched)
+		QueryValues("select NullInt64 from `Tests` order by NullInt64 desc", nil, &fetched)
 	assert.Nil(t, err)
 	assert.Len(t, fetched, 2)
 	assert.True(t, fetched[0].Valid)
@@ -86,7 +86,7 @@ func TestQueryOneAsField(t *testing.T) {
 	params1 := map[string]interface{}{"string": testRecord1.String}
 	err := testRepository.
 		Reader(ctx, dataClient.Single()).
-		QueryValue("select ArrayInt64 from Test where `String` = @string", params1, &arrayInt641)
+		QueryValue("select ArrayInt64 from `Tests` where `String` = @string", params1, &arrayInt641)
 	assert.Nil(t, err)
 	assert.Equal(t, testRecord1.ArrayInt64, arrayInt641)
 
@@ -94,7 +94,7 @@ func TestQueryOneAsField(t *testing.T) {
 	params2 := map[string]interface{}{"string": testRecord2.String}
 	err = testRepository.
 		Reader(ctx, dataClient.Single()).
-		QueryValue("select ArrayInt64 from Test where `String` = @string", params2, &arrayInt642)
+		QueryValue("select ArrayInt64 from `Tests` where `String` = @string", params2, &arrayInt642)
 	assert.Nil(t, err)
 	assert.Equal(t, testRecord2.ArrayInt64, arrayInt642)
 }

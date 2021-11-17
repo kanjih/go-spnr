@@ -54,7 +54,8 @@ var (
 		NullInt64:  NewNullInt64(200),
 		ArrayInt64: []int64{4},
 	}
-	testRepository = NewMutation("Test")
+	testRepository = New()
+	//testRepository = NewMutationWithOptions(&Options{TableName: "Tests"})
 )
 
 type Test struct {

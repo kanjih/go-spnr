@@ -37,14 +37,15 @@ func (m *Mutation) ApplyDelete(ctx context.Context, client *spanner.Client, targ
 }
 
 func (m *Mutation) buildDelete(targets []interface{}) []*spanner.Mutation {
+	table := m.getTableName(targets[0])
 	var ms []*spanner.Mutation
 	for _, target := range targets {
 		var pks spanner.Key
 		for _, pk := range extractPks(toFields(target)) {
 			pks = append(pks, pk.value)
 		}
-		ms = append(ms, spanner.Delete(m.table, pks))
-		m.log("Deleting from %s, key=%+v", m.table, pks)
+		ms = append(ms, spanner.Delete(table, pks))
+		m.log("Deleting from %s, key=%+v", table, pks)
 	}
 	return ms
 }

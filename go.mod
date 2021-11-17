@@ -5,6 +5,7 @@ go 1.16
 require (
 	cloud.google.com/go v0.97.0
 	cloud.google.com/go/spanner v1.27.0
+	github.com/gertd/go-pluralize v0.1.7 // indirect
 	github.com/iancoleman/strcase v0.2.0
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.7.0

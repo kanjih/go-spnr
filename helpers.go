@@ -10,6 +10,18 @@ import (
 
 var errNotPointer = errors.New("final argument must be passed as pointer")
 
+func getTableName(structVal reflect.Value) string {
+	if structVal.Kind() == reflect.Ptr {
+		structVal = structVal.Elem()
+	}
+	structName := structVal.Type().Name()
+	return convertToTableName(structName)
+}
+
+func convertToTableName(structName string) string {
+	return pluralizeClient.Plural(structName)
+}
+
 func extractPks(fields []field) []field {
 	var pks []field
 	for _, field := range fields {

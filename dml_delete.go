@@ -30,7 +30,7 @@ func (d *DML) buildDeleteStmt(target interface{}) *spanner.Statement {
 	fields := toFields(target)
 	whereClause, params := buildWherePK(fields)
 	sql := fmt.Sprintf("DELETE FROM %s WHERE %s",
-		d.getTableName(),
+		d.getTableName(target),
 		whereClause,
 	)
 	d.log(sql, params)
@@ -45,6 +45,7 @@ func (d *DML) buildDeleteAllStmt(target interface{}) *spanner.Statement {
 	params := map[string]interface{}{}
 
 	slice := reflect.ValueOf(target).Elem()
+	table := d.getTableNameFromVal(slice.Index(0))
 	for i := 0; i < slice.Len(); i++ {
 		var values []string
 		for _, field := range extractPks(structValToFields(slice.Index(i))) {
@@ -56,7 +57,7 @@ func (d *DML) buildDeleteAllStmt(target interface{}) *spanner.Statement {
 	}
 
 	sql := fmt.Sprintf("DELETE FROM %s WHERE %s",
-		d.getTableName(),
+		table,
 		strings.Join(valuesList, " OR "),
 	)
 
