@@ -2,38 +2,7 @@
 
 ORM for Cloud Spanner to boost your productivity
 
-## How spnr ORM looks like?
-Here's the exmaple code 👇 
-```go
-// initialize spnr with table name
-singerStore := spnr.New("Singers")
-
-// save record (spnr provides many other functions for Mutation API & DML!)
-singerStore.ApplyInsertOrUpdate(ctx, client, &Singer{SingerID: "a", Name: "Alice"})
-
-// fetch record
-var singer Singer
-singerStore.Reader(ctx, client.Single()).FindOne(spanner.Key{"a"}, &singer)
-
-// fetch record using raw query
-var singers []Singer
-query := "select * from Singers where SingerId=@singerId"
-params := map[string]interface{}{"singerId": "a"}
-singerStore.Reader(ctx, client.Single()).Query(query, params, &singers)
-```
-
-## Features
-- Supports both **Mutation API** & **DML**
-- Supports code generation to map records
-- Supports raw SQLs for not simple cases
-
-## Getting started 🏃‍♂️
-### Installation
-```
-go get github.com/kanjih/go-spnr
-```
-
-### Code
+## Example 🔧
 ```go
 package main
 
@@ -54,15 +23,31 @@ type Singer struct {
 
 func main(ctx context.Context, client *spanner.Client) {
 	// initialize
-	singerStore := spnr.New("Singers")
+	singerStore := spnr.New("Singers") // specify table name
 
-	// save record
-	singerStore.ApplyInsertOrUpdate(ctx, client, &Singer{"a", "Alice"})
+	// save record (spnr supports both Mutation API & DML!)
+	singerStore.ApplyInsertOrUpdate(ctx, client, &Singer{SingerID: "a", Name: "Alice"})
 
 	// fetch record
 	var singer Singer
 	singerStore.Reader(ctx, client.Single()).FindOne(spanner.Key{"a"}, &singer)
+
+	// fetch record using raw query
+	var singers []Singer
+	query := "select * from Singers where SingerId=@singerId"
+	params := map[string]interface{}{"singerId": "a"}
+	singerStore.Reader(ctx, client.Single()).Query(query, params, &singers)
 }
+```
+
+## Features
+- Supports both **Mutation API** & **DML**
+- Supports code generation to map records
+- Supports raw SQLs for not simple cases
+
+## Installation
+```
+go get github.com/kanjih/go-spnr
 ```
 
 ## Table of contents
