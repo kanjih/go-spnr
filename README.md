@@ -43,7 +43,7 @@ func main(ctx context.Context, client *spanner.Client) {
 ## Features
 - Supports both **Mutation API** & **DML**
 - Supports code generation to map records
-- Supports raw SQLs for not simple cases
+- Supports raw SQLs for complicated cases
 
 spnr is desined
 - 🙆‍♂️ for reducing boliderplate codes (mapping selected records to struct or write simple insert/update/delete operations)
