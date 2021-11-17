@@ -102,7 +102,7 @@ type cols struct {
   Score spanner.NullInt64 `spanner:"Score"`
 }
 var res cols
-singerStore.Read(ctx, tx).FindOne(spanner.Key{"1"}, &res)
+singerStore.Reader(ctx, tx).FindOne(spanner.Key{"1"}, &res)
 ```
 
 ### 3. Select records using query
