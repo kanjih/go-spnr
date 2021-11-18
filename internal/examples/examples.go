@@ -159,7 +159,7 @@ func useSingerStore(ctx context.Context, client *spanner.Client) {
 	singerStore := NewSingerStore()
 
 	client.ReadWriteTransaction(ctx, func(ctx context.Context, tx *spanner.ReadWriteTransaction) error {
-		// You can use all operations that spnr.DML has 
+		// You can use all operations that spnr.DML has
 		singerStore.Insert(ctx, tx, &Singer{SingerID: "a", Name: "Alice"})
 		var singer Singer
 		singerStore.Reader(ctx, tx).FindOne(spanner.Key{"a"}, &singer)

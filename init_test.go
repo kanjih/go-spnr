@@ -201,10 +201,5 @@ func initDatabase(ctx context.Context) (err error) {
 		return err
 	}
 
-	ls := []*Test{testRecord1, testRecord2}
-	if _, err = testRepository.ApplyInsertOrUpdate(ctx, dataClient, &ls); err != nil {
-		return err
-	}
-
 	return err
 }
