@@ -238,3 +238,8 @@ spnr provides some helper functions to reduce boilerplates.
   - You can convert slice to keysets using `spnr.ToKeySets([]string{"a", "b"})`
 
 Love reporting issues! 
+
+[![GoDev][godev-image]][godev-url]
+
+[godev-image]: https://pkg.go.dev/badge/github.com/kanjih/go-spnr
+[godev-url]: https://pkg.go.dev/github.com/kanjih/go-spnr
