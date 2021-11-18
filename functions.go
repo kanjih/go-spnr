@@ -73,7 +73,7 @@ func ToKeySets(target interface{}) spanner.KeySet {
 // ToAllColumnNames receives struct and returns the fields that the passed struct has.
 // This method is useful when you build query to select all the fields.
 // Instead of use *(wildcard), you can specify all of the columns using this method.
-// Then you can avoid the risk that failing to map record to struct caused by the mismatch of an order of columns in spanner table and fields in struct. 
+// Then you can avoid the risk that failing to map record to struct caused by the mismatch of an order of columns in spanner table and fields in struct.
 func ToAllColumnNames(target interface{}) string {
 	var columnNames []string
 	for _, f := range structValToFields(reflect.ValueOf(target).Elem()) {

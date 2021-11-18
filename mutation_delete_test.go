@@ -23,20 +23,25 @@ func TestMutation_DeleteWithSlice(t *testing.T) {
 	_, err := testRepository.ApplyInsertOrUpdate(ctx, dataClient, &([]*Test{testRecord3, testRecord4}))
 	assert.Nil(t, err)
 
-	_, err = testRepository.ApplyDelete(ctx, dataClient, &([]*Test{testRecord3, testRecord4}))
+	_, err = testRepository.ApplyDelete(ctx, dataClient, &([]Test{*testRecord3, *testRecord4}))
 	assert.Nil(t, err)
 
 	var fetched []Test
 	keySet := spanner.KeySetFromKeys(spanner.Key{testRecord3.String, testRecord3.Int64}, spanner.Key{testRecord4.String, testRecord4.Int64})
 	_ = testRepository.Reader(ctx, dataClient.Single()).FindAll(keySet, &fetched)
 	assert.Empty(t, fetched)
+}
 
-	_, err = testRepository.ApplyInsertOrUpdate(ctx, dataClient, &([]*Test{testRecord3, testRecord4}))
+func TestMutation_DeleteWithSlicePointer(t *testing.T) {
+	ctx := context.Background()
+	_, err := testRepository.ApplyInsertOrUpdate(ctx, dataClient, &([]*Test{testRecord3, testRecord4}))
 	assert.Nil(t, err)
 
-	_, err = testRepository.ApplyDelete(ctx, dataClient, &([]Test{*testRecord3, *testRecord4}))
+	_, err = testRepository.ApplyDelete(ctx, dataClient, &([]*Test{testRecord3, testRecord4}))
 	assert.Nil(t, err)
 
+	var fetched []Test
+	keySet := spanner.KeySetFromKeys(spanner.Key{testRecord3.String, testRecord3.Int64}, spanner.Key{testRecord4.String, testRecord4.Int64})
 	_ = testRepository.Reader(ctx, dataClient.Single()).FindAll(keySet, &fetched)
 	assert.Empty(t, fetched)
 }

@@ -26,7 +26,7 @@ var testRecord3 = &Test{
 }
 
 var testRecord4 = &Test{
-	String:      "testId1",
+	String:      "testId2",
 	Bytes:       []byte{1},
 	Int64:       10,
 	Float64:     84.217403,
@@ -57,13 +57,15 @@ func TestMutation_InsertOrUpdate(t *testing.T) {
 	assert.Equal(t, testRecord3.NullInt64, fetched.NullInt64)
 	assert.Equal(t, testRecord3.ArrayInt64, fetched.ArrayInt64)
 	assert.Equal(t, testRecord3.ArrayBytes, fetched.ArrayBytes)
+
+	// clean up
+	_, err = testRepository.ApplyDelete(ctx, dataClient, testRecord3)
+	assert.Nil(t, err)
 }
 
 func TestMutation_InsertOrUpdateWithSlice(t *testing.T) {
 	ctx := context.Background()
-	_, err := testRepository.ApplyDelete(ctx, dataClient, &([]*Test{testRecord3, testRecord4}))
-	assert.Nil(t, err)
-	_, err = testRepository.ApplyInsertOrUpdate(ctx, dataClient, &([]*Test{testRecord3, testRecord4}))
+	_, err := testRepository.ApplyInsertOrUpdate(ctx, dataClient, &([]*Test{testRecord3, testRecord4}))
 	assert.Nil(t, err)
 	var fetched Test
 
@@ -114,4 +116,7 @@ func TestMutation_InsertOrUpdateWithSlice(t *testing.T) {
 	assert.Equal(t, testRecord5.Bytes, fetched.Bytes)
 	assert.Equal(t, testRecord6.Float64, fetched.Float64)
 
+	// clean up
+	_, err = testRepository.ApplyDelete(ctx, dataClient, &([]*Test{testRecord3, testRecord4}))
+	assert.Nil(t, err)
 }
