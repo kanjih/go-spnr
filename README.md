@@ -1,6 +1,6 @@
 <img src="https://user-images.githubusercontent.com/21299899/142083327-cd45a119-2d2b-4cec-b0d3-4b57d843877f.png" width="400px">
 
-ORM for Cloud Spanner to boost your productivity
+ORM for Cloud Spanner to boost your productivity 🚀
 
 ## Example 🔧
 ```go
