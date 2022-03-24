@@ -11,7 +11,6 @@ package main
 import (
 	"cloud.google.com/go/spanner"
 	"context"
-	"fmt"
 	"github.com/kanjih/go-spnr"
 )
 
@@ -23,7 +22,10 @@ type Singer struct {
 	Name     string `spanner:"Name"`
 }
 
-func main(ctx context.Context, client *spanner.Client) {
+func main() {
+	ctx := context.Background()
+	client, _ := spanner.NewClient(ctx, "projects/{project_id}/instances/{instance_id}/databases/{database_id}")
+
 	// initialize
 	singerStore := spnr.New("Singers") // specify table name
 
