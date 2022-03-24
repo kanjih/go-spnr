@@ -17,7 +17,7 @@ func NewNullString(str string) spanner.NullString {
 	}
 }
 
-// NewNullString initializes spanner.NullString setting Valid as true
+// NewNullBool initializes spanner.NullBool setting Valid as true
 func NewNullBool(b bool) spanner.NullBool {
 	return spanner.NullBool{
 		Bool:  b,
@@ -25,7 +25,7 @@ func NewNullBool(b bool) spanner.NullBool {
 	}
 }
 
-// NewNullString initializes spanner.NullString setting Valid as true
+// NewNullInt64 initializes spanner.NullInt64 setting Valid as true
 func NewNullInt64(val int64) spanner.NullInt64 {
 	return spanner.NullInt64{
 		Int64: val,
@@ -33,7 +33,7 @@ func NewNullInt64(val int64) spanner.NullInt64 {
 	}
 }
 
-// NewNullString initializes spanner.NullString setting Valid as true
+// NewNullNumeric initializes spanner.NullNumeric setting Valid as true
 func NewNullNumeric(a, b int64) spanner.NullNumeric {
 	return spanner.NullNumeric{
 		Numeric: *big.NewRat(a, b),
@@ -41,7 +41,7 @@ func NewNullNumeric(a, b int64) spanner.NullNumeric {
 	}
 }
 
-// NewNullString initializes spanner.NullString setting Valid as true
+// NewNullDate initializes spanner.NullDate setting Valid as true
 func NewNullDate(d civil.Date) spanner.NullDate {
 	return spanner.NullDate{
 		Date:  d,
@@ -49,7 +49,7 @@ func NewNullDate(d civil.Date) spanner.NullDate {
 	}
 }
 
-// NewNullString initializes spanner.NullString setting Valid as true
+// NewNullTime initializes spanner.NullTime setting Valid as true
 func NewNullTime(t time.Time) spanner.NullTime {
 	return spanner.NullTime{
 		Time:  t,
