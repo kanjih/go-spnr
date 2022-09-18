@@ -5,6 +5,7 @@ go 1.16
 require (
 	cloud.google.com/go v0.104.0
 	cloud.google.com/go/spanner v1.38.0
+	github.com/googleapis/gax-go/v2 v2.4.0
 	github.com/iancoleman/strcase v0.2.0
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.8.0

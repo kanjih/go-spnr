@@ -1,8 +1,8 @@
-name: PR-Reviewer
+name: review
 
 on:
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
 
 jobs:
   setup:
