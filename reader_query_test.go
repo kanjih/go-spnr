@@ -1,11 +1,12 @@
 package spnr
 
 import (
-	"cloud.google.com/go/spanner"
 	"context"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"cloud.google.com/go/spanner"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestQuery(t *testing.T) {
@@ -37,7 +38,7 @@ func TestQueryOne(t *testing.T) {
 	assert.Nil(t, prepareReadTest(ctx))
 
 	var fetched Test
-	params1 := map[string]interface{}{"string": testRecord1.String}
+	params1 := map[string]any{"string": testRecord1.String}
 	err := testRepository.
 		Reader(ctx, dataClient.Single()).
 		QueryOne("select * from Test where `String` = @string", params1, &fetched)
@@ -62,7 +63,7 @@ func TestQueryOneOrderChanged(t *testing.T) {
 
 	var fetched TestOrderChanged
 	query := fmt.Sprintf("select %s from Test where `String` = @string", ToAllColumnNames(&TestOrderChanged{}))
-	params1 := map[string]interface{}{"string": testRecord1.String}
+	params1 := map[string]any{"string": testRecord1.String}
 	err := testRepository.
 		Reader(ctx, dataClient.Single()).
 		QueryOne(query, params1, &fetched)
@@ -104,7 +105,7 @@ func TestQueryOneAsField(t *testing.T) {
 	assert.Nil(t, prepareReadTest(ctx))
 
 	var arrayInt641 []int64
-	params1 := map[string]interface{}{"string": testRecord1.String}
+	params1 := map[string]any{"string": testRecord1.String}
 	err := testRepository.
 		Reader(ctx, dataClient.Single()).
 		QueryValue("select ArrayInt64 from Test where `String` = @string", params1, &arrayInt641)
@@ -112,7 +113,7 @@ func TestQueryOneAsField(t *testing.T) {
 	assert.Equal(t, testRecord1.ArrayInt64, arrayInt641)
 
 	var arrayInt642 []int64
-	params2 := map[string]interface{}{"string": testRecord2.String}
+	params2 := map[string]any{"string": testRecord2.String}
 	err = testRepository.
 		Reader(ctx, dataClient.Single()).
 		QueryValue("select ArrayInt64 from Test where `String` = @string", params2, &arrayInt642)

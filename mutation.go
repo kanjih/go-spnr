@@ -47,7 +47,7 @@ func (m *Mutation) GetTableName() string {
 	return m.table
 }
 
-func (m *Mutation) logf(format string, v ...interface{}) {
+func (m *Mutation) logf(format string, v ...any) {
 	if m.logEnabled {
 		m.logger.Printf(format, v...)
 	}

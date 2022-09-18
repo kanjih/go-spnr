@@ -34,9 +34,9 @@ func extractNotPks(fields []field) []field {
 	return notPks
 }
 
-func buildWherePK(fields []field) (string, map[string]interface{}) {
+func buildWherePK(fields []field) (string, map[string]any) {
 	var columns []string
-	params := map[string]interface{}{}
+	params := map[string]any{}
 	for _, field := range extractPks(fields) {
 		param := addW(field.name)
 		columns = append(columns, quote(field.name)+"="+addPlaceHolder(param))
@@ -61,7 +61,7 @@ func quote(str string) string {
 	return "`" + str + "`"
 }
 
-func validateStructType(target interface{}) error {
+func validateStructType(target any) error {
 	rv := reflect.ValueOf(target)
 	if rv.Kind() != reflect.Ptr {
 		return errNotPointer
@@ -72,7 +72,7 @@ func validateStructType(target interface{}) error {
 	return nil
 }
 
-func validateSliceType(target interface{}) error {
+func validateSliceType(target any) error {
 	rv := reflect.ValueOf(target)
 	if rv.Kind() != reflect.Ptr {
 		return errNotPointer
@@ -83,7 +83,7 @@ func validateSliceType(target interface{}) error {
 	return nil
 }
 
-func validateStructSliceType(target interface{}) error {
+func validateStructSliceType(target any) error {
 	rv := reflect.ValueOf(target)
 	if rv.Kind() != reflect.Ptr {
 		return errNotPointer
@@ -97,7 +97,7 @@ func validateStructSliceType(target interface{}) error {
 	return nil
 }
 
-func validateStructOrStructSliceType(target interface{}) (isStruct bool, err error) {
+func validateStructOrStructSliceType(target any) (isStruct bool, err error) {
 	rv := reflect.ValueOf(target)
 	if rv.Kind() != reflect.Ptr {
 		return false, errNotPointer
@@ -119,9 +119,9 @@ func validateStructOrStructSliceType(target interface{}) (isStruct bool, err err
 	}
 }
 
-// toStructSlice converts interface{} to slice of struct s
-func toStructSlice(target interface{}) []interface{} {
-	var parsed []interface{}
+// toStructSlice converts any to slice of struct s
+func toStructSlice(target any) []any {
+	var parsed []any
 	slice := reflect.ValueOf(target).Elem()
 	for i := 0; i < slice.Len(); i++ {
 		e := slice.Index(i)

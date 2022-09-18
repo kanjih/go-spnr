@@ -13,7 +13,7 @@ const (
 
 type field struct {
 	name    string
-	value   interface{}
+	value   any
 	pkOrder int
 }
 
@@ -21,7 +21,7 @@ func (f *field) isPk() bool {
 	return f.pkOrder != noPk
 }
 
-func toFields(target interface{}) []field {
+func toFields(target any) []field {
 	return structValToFields(reflect.ValueOf(target).Elem())
 }
 

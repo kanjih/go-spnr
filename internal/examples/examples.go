@@ -40,7 +40,7 @@ func example(ctx context.Context, client *spanner.Client) {
 	// fetch record using raw query
 	var singers []Singer
 	query := "select * from Singers where SingerId=@singerId"
-	params := map[string]interface{}{"singerId": "a"}
+	params := map[string]any{"singerId": "a"}
 	singerStore.Reader(ctx, client.Single()).Query(query, params, &singers)
 }
 
@@ -80,7 +80,7 @@ func selectMultipleColumnsUsingPrimaryKeys(ctx context.Context, tx spnr.Transact
 func selectRecordsUsingQuery(ctx context.Context, tx spnr.Transaction, singerStore *spnr.Mutation) {
 	var singer Singer
 	query := "select * from `Singers` where SingerId=@singerId"
-	params := map[string]interface{}{"singerId": "a"}
+	params := map[string]any{"singerId": "a"}
 	singerStore.Reader(ctx, tx).QueryOne(query, params, &singer)
 
 	var singers []Singer
@@ -150,7 +150,7 @@ func NewSingerStore() *SingerStore {
 }
 
 // Any methods you want to add
-func (s *SingerStore) GetCount(ctx context.Context, tx spnr.Transaction, cnt interface{}) error {
+func (s *SingerStore) GetCount(ctx context.Context, tx spnr.Transaction, cnt any) error {
 	query := "select count(*) as cnt from Singers"
 	return s.Reader(ctx, tx).QueryValue(query, nil, cnt)
 }

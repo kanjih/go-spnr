@@ -14,7 +14,7 @@ import (
 // You can pass either a struct or a slice of structs to target.
 // If you pass a slice of structs, this method will build statement which deletes multiple records in one statement like the following.
 //	DELETE FROM `T` WHERE (`COL1` = 'a' AND `COL2` = 'b') OR (`COL1` = 'c' AND `COL2` = 'd');
-func (d *DML) Delete(ctx context.Context, tx *spanner.ReadWriteTransaction, target interface{}) (rowCount int64, err error) {
+func (d *DML) Delete(ctx context.Context, tx *spanner.ReadWriteTransaction, target any) (rowCount int64, err error) {
 	isStruct, err := validateStructOrStructSliceType(target)
 	if err != nil {
 		return 0, err
@@ -28,7 +28,7 @@ func (d *DML) Delete(ctx context.Context, tx *spanner.ReadWriteTransaction, targ
 	}
 }
 
-func (d *DML) buildDeleteStmt(target interface{}) *spanner.Statement {
+func (d *DML) buildDeleteStmt(target any) *spanner.Statement {
 	fields := toFields(target)
 	whereClause, params := buildWherePK(fields)
 	sql := fmt.Sprintf("DELETE FROM %s WHERE %s",
@@ -42,9 +42,9 @@ func (d *DML) buildDeleteStmt(target interface{}) *spanner.Statement {
 	}
 }
 
-func (d *DML) buildDeleteAllStmt(target interface{}) *spanner.Statement {
+func (d *DML) buildDeleteAllStmt(target any) *spanner.Statement {
 	var valuesList []string
-	params := map[string]interface{}{}
+	params := map[string]any{}
 
 	slice := reflect.ValueOf(target).Elem()
 	for i := 0; i < slice.Len(); i++ {
