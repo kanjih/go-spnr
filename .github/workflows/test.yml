@@ -23,7 +23,5 @@ jobs:
           ref: ${{ github.event.pull_request.head.ref }}
       - name: go mod download
         run: go mod download
-      - name: prepare test
-        run: go get github.com/docker/docker/pkg/system@v20.10.7+incompatible
       - name: test
         run: go test ./... 
