@@ -11,7 +11,7 @@ require (
 	github.com/stretchr/testify v1.8.0
 	github.com/testcontainers/testcontainers-go v0.14.0
 	github.com/urfave/cli/v2 v2.16.3
-	google.golang.org/api v0.94.0
+	google.golang.org/api v0.96.0
 	google.golang.org/genproto v0.0.0-20220916172020-2692e8806bfa
 	google.golang.org/grpc v1.48.0
 	gotest.tools v2.2.0+incompatible
