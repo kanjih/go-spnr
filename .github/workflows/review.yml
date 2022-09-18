@@ -14,10 +14,10 @@ jobs:
     needs: setup
     runs-on: ubuntu-latest
     steps:
-      - name: Set up Go 1.16.6
+      - name: Set up Go 1.19.1
         uses: actions/setup-go@v2
         with:
-          go-version: 1.16.6
+          go-version: 1.19.1
       - uses: actions/checkout@v2
         with:
           ref: ${{ github.event.pull_request.head.ref }}
@@ -29,10 +29,10 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Set up Go 1.16.6
+      - name: Set up Go 1.19.1
         uses: actions/setup-go@v2
         with:
-          go-version: 1.16.6
+          go-version: 1.19.1
       - uses: actions/checkout@v2
         with:
           ref: ${{ github.event.pull_request.head.ref }} # PRを作ったbranch名
