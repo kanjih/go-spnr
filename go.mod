@@ -11,7 +11,7 @@ require (
 	github.com/testcontainers/testcontainers-go v0.11.1
 	github.com/urfave/cli/v2 v2.3.0
 	google.golang.org/api v0.93.0
-	google.golang.org/genproto v0.0.0-20220822174746-9e6da59bd2fc
+	google.golang.org/genproto v0.0.0-20220916172020-2692e8806bfa
 	google.golang.org/grpc v1.48.0
 	gotest.tools v2.2.0+incompatible
 )
