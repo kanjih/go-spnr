@@ -1,6 +1,6 @@
 module github.com/kanjih/go-spnr
 
-go 1.16
+go 1.19
 
 require (
 	cloud.google.com/go v0.104.0
