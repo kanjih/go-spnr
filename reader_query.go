@@ -19,7 +19,7 @@ If multiple records are found, this method will return ErrMoreThanOneRecordFound
 If you don't need to fetch all columns but only needs one column, use QueryValue instead.
 If you don't need to fetch all columns but only needs some columns, please make a temporal struct to map the columns.
 */
-func (r *Reader) QueryOne(sql string, params map[string]interface{}, target interface{}) error {
+func (r *Reader) QueryOne(sql string, params map[string]any, target any) error {
 	if err := validateStructType(target); err != nil {
 		return err
 	}
@@ -50,7 +50,7 @@ func (r *Reader) QueryOne(sql string, params map[string]interface{}, target inte
 }
 
 // Query fetches records by calling specified query, and map the records into the passed pointer of a slice of struct.
-func (r *Reader) Query(sql string, params map[string]interface{}, target interface{}) error {
+func (r *Reader) Query(sql string, params map[string]any, target any) error {
 	if err := validateStructSliceType(target); err != nil {
 		return err
 	}
@@ -90,7 +90,7 @@ Example:
 	var cnt int64
 	QueryValue("select count(*) as cnt from Singers", nil, &cnt)
 */
-func (r *Reader) QueryValue(sql string, params map[string]interface{}, target interface{}) error {
+func (r *Reader) QueryValue(sql string, params map[string]any, target any) error {
 	r.logf(readLogTemplate, "sql:"+sql, params)
 	iter := r.tx.Query(r.ctx, spanner.Statement{SQL: sql, Params: params})
 	defer iter.Stop()
@@ -126,7 +126,7 @@ Example:
 	var names []string
 	QueryValue("select Name from Singers", nil, &names)
 */
-func (r *Reader) QueryValues(sql string, params map[string]interface{}, target interface{}) error {
+func (r *Reader) QueryValues(sql string, params map[string]any, target any) error {
 	if err := validateSliceType(target); err != nil {
 		return err
 	}

@@ -36,7 +36,7 @@ type Reader struct {
 	logEnabled bool
 }
 
-func (r *Reader) logf(format string, v ...interface{}) {
+func (r *Reader) logf(format string, v ...any) {
 	if !r.logEnabled {
 		return
 	}

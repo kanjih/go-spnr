@@ -13,7 +13,7 @@ import (
 // Update build and execute update statement from the passed struct.
 // You can pass either a struct or slice of struct to target.
 // If you pass a slice of struct, this method will call update statement in for loop.
-func (d *DML) Update(ctx context.Context, tx *spanner.ReadWriteTransaction, target interface{}) (rowCount int64, err error) {
+func (d *DML) Update(ctx context.Context, tx *spanner.ReadWriteTransaction, target any) (rowCount int64, err error) {
 	isStruct, err := validateStructOrStructSliceType(target)
 	if err != nil {
 		return 0, err
@@ -27,7 +27,7 @@ func (d *DML) Update(ctx context.Context, tx *spanner.ReadWriteTransaction, targ
 	}
 }
 
-func (d *DML) updateAll(ctx context.Context, tx *spanner.ReadWriteTransaction, target interface{}) (rowCount int64, err error) {
+func (d *DML) updateAll(ctx context.Context, tx *spanner.ReadWriteTransaction, target any) (rowCount int64, err error) {
 	slice := reflect.ValueOf(target).Elem()
 	for i := 0; i < slice.Len(); i++ {
 		cnt, err := tx.Update(ctx, *d.buildUpdateStmt(slice.Index(i).Addr().Interface(), nil))
@@ -43,7 +43,7 @@ func (d *DML) updateAll(ctx context.Context, tx *spanner.ReadWriteTransaction, t
 // You can specify the columns to update.
 // Also, you can pass either a struct or slice of struct to target.
 // If you pass a slice of struct, this method will call update statement in for loop.
-func (d *DML) UpdateColumns(ctx context.Context, tx *spanner.ReadWriteTransaction, columns []string, target interface{}) (rowCount int64, err error) {
+func (d *DML) UpdateColumns(ctx context.Context, tx *spanner.ReadWriteTransaction, columns []string, target any) (rowCount int64, err error) {
 	isStruct, err := validateStructOrStructSliceType(target)
 	if err != nil {
 		return 0, err
@@ -57,10 +57,10 @@ func (d *DML) UpdateColumns(ctx context.Context, tx *spanner.ReadWriteTransactio
 	}
 }
 
-func (d *DML) buildUpdateStmt(target interface{}, columns []string) *spanner.Statement {
+func (d *DML) buildUpdateStmt(target any, columns []string) *spanner.Statement {
 	fields := toFields(target)
 	var setClause string
-	var params map[string]interface{}
+	var params map[string]any
 	if columns != nil {
 		setClause, params = buildSetClauseWithColumns(fields, columns)
 	} else {
@@ -82,9 +82,9 @@ func (d *DML) buildUpdateStmt(target interface{}, columns []string) *spanner.Sta
 	}
 }
 
-func buildSetClause(fields []field) (string, map[string]interface{}) {
+func buildSetClause(fields []field) (string, map[string]any) {
 	var columns []string
-	params := map[string]interface{}{}
+	params := map[string]any{}
 	for _, field := range extractNotPks(fields) {
 		columns = append(columns, quote(field.name)+"="+addPlaceHolder(field.name))
 		params[field.name] = field.value
@@ -92,14 +92,14 @@ func buildSetClause(fields []field) (string, map[string]interface{}) {
 	return strings.Join(columns, ", "), params
 }
 
-func buildSetClauseWithColumns(fields []field, columns []string) (string, map[string]interface{}) {
+func buildSetClauseWithColumns(fields []field, columns []string) (string, map[string]any) {
 	fieldsMap := map[string]field{}
 	for _, f := range fields {
 		fieldsMap[f.name] = f
 	}
 
 	var setColumns []string
-	params := map[string]interface{}{}
+	params := map[string]any{}
 	for _, c := range columns {
 		f := fieldsMap[c]
 		setColumns = append(setColumns, quote(f.name)+"="+addPlaceHolder(f.name))

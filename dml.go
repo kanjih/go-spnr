@@ -52,7 +52,7 @@ func (d *DML) getTableName() string {
 	return quote(d.table)
 }
 
-func (d *DML) log(sql string, params map[string]interface{}) {
+func (d *DML) log(sql string, params map[string]any) {
 	if !d.logEnabled {
 		return
 	}

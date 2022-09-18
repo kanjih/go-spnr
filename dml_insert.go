@@ -14,7 +14,7 @@ import (
 // You can pass either a struct or a slice of struct to target.
 // If you pass a slice of struct, this method will build a statement which insert multiple records in one statement like the following
 // 	INSERT INTO `TableName` (`Column1`, `Column2`) VALUES ('a', 'b'), ('c', 'd'), ...;
-func (d *DML) Insert(ctx context.Context, tx *spanner.ReadWriteTransaction, target interface{}) (rowCount int64, err error) {
+func (d *DML) Insert(ctx context.Context, tx *spanner.ReadWriteTransaction, target any) (rowCount int64, err error) {
 	isStruct, err := validateStructOrStructSliceType(target)
 	if err != nil {
 		return 0, err
@@ -28,10 +28,10 @@ func (d *DML) Insert(ctx context.Context, tx *spanner.ReadWriteTransaction, targ
 	}
 }
 
-func (d *DML) buildInsertStmt(target interface{}) *spanner.Statement {
+func (d *DML) buildInsertStmt(target any) *spanner.Statement {
 	var columns []string
 	var values []string
-	params := map[string]interface{}{}
+	params := map[string]any{}
 	for _, field := range toFields(target) {
 		columns = append(columns, quote(field.name))
 		values = append(values, addPlaceHolder(field.name))
@@ -51,10 +51,10 @@ func (d *DML) buildInsertStmt(target interface{}) *spanner.Statement {
 	}
 }
 
-func (d *DML) buildInsertAllStmt(target interface{}) *spanner.Statement {
+func (d *DML) buildInsertAllStmt(target any) *spanner.Statement {
 	var columns []string
 	var valuesList []string
-	params := map[string]interface{}{}
+	params := map[string]any{}
 
 	slice := reflect.ValueOf(target).Elem()
 	for i := 0; i < slice.Len(); i++ {

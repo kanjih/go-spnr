@@ -41,7 +41,7 @@ func main() {
 	// fetch record using raw query
 	var singers []Singer
 	query := "select * from Singers where SingerId=@singerId"
-	params := map[string]interface{}{"singerId": "a"}
+	params := map[string]any{"singerId": "a"}
 	singerStore.Reader(ctx, client.Single()).Query(query, params, &singers)
 }
 ```
@@ -67,8 +67,9 @@ spnr is designed ...
 
 ## Installation
 ```
-go get github.com/kanjih/go-spnr
+go get github.com/kanjih/go-spnr/v2
 ```
+\* v2 requires go 1.18 or later. If you use previous go versions please use v1.
 
 ## Read operations
 spnr provides the following types of read operations 💪
@@ -115,7 +116,7 @@ singerStore.Reader(ctx, tx).FindOne(spanner.Key{"1"}, &res)
 ```go
 var singer Singer
 query := "select * from `Singers` where SingerId=@singerId"
-params := map[string]interface{}{"singerId": "a"}
+params := map[string]any{"singerId": "a"}
 singerStore.Reader(ctx, tx).QueryOne(query, params, &singer)
 
 var singers []Singer
@@ -187,7 +188,7 @@ singerStore.Delete(ctx, tx, singer)
 You don't need spnr in this case! Plain spanner SDK is enough.
 ```go
 sql := "UPDATE `Singers` SET `Name` = xx WHERE `Id` = @Id"
-params := map[string]interface{}
+params := map[string]any
 spannerClient.Update(tx, spanner.Statement{SQL: sql, Params: params})
 ```
 
@@ -205,7 +206,7 @@ func NewSingerStore() *SingerStore {
 }
 
 // Any methods you want to add
-func (s *SingerStore) GetCount(ctx context.Context, tx spnr.Transaction, cnt interface{}) error {
+func (s *SingerStore) GetCount(ctx context.Context, tx spnr.Transaction, cnt any) error {
 	query := "select count(*) as cnt from Singers"
 	return s.Reader(ctx, tx).Query(query, nil, &cnt)
 }

@@ -14,13 +14,13 @@ import (
 // If you pass a slice of structs, this method will call multiple mutations for each struct.
 // This method requires spanner.ReadWriteTransaction, and will call spanner.ReadWriteTransaction.BufferWrite to save the mutation to transaction.
 // If you want to insert or update only the specified columns, use InsertOrUpdateColumns instead.
-func (m *Mutation) InsertOrUpdate(tx *spanner.ReadWriteTransaction, target interface{}) error {
+func (m *Mutation) InsertOrUpdate(tx *spanner.ReadWriteTransaction, target any) error {
 	isStruct, err := validateStructOrStructSliceType(target)
 	if err != nil {
 		return err
 	}
 	if isStruct {
-		return errors.WithStack(tx.BufferWrite(m.buildInsertOrUpdate([]interface{}{target})))
+		return errors.WithStack(tx.BufferWrite(m.buildInsertOrUpdate([]any{target})))
 	}
 	return errors.WithStack(tx.BufferWrite(m.buildInsertOrUpdate(toStructSlice(target))))
 }
@@ -28,13 +28,13 @@ func (m *Mutation) InsertOrUpdate(tx *spanner.ReadWriteTransaction, target inter
 // ApplyInsertOrUpdate is basically same as InsertOrUpdate, but it doesn't require transaction.
 // This method directly calls mutation API without transaction by calling spanner.Client.Apply method.
 // If you want to insert or update only the specified columns, use ApplyInsertOrUpdateColumns instead.
-func (m *Mutation) ApplyInsertOrUpdate(ctx context.Context, client *spanner.Client, target interface{}) (time.Time, error) {
+func (m *Mutation) ApplyInsertOrUpdate(ctx context.Context, client *spanner.Client, target any) (time.Time, error) {
 	isStruct, err := validateStructOrStructSliceType(target)
 	if err != nil {
 		return time.Time{}, err
 	}
 	if isStruct {
-		t, err := client.Apply(ctx, m.buildInsertOrUpdate([]interface{}{target}))
+		t, err := client.Apply(ctx, m.buildInsertOrUpdate([]any{target}))
 		return t, errors.WithStack(err)
 	}
 	t, err := client.Apply(ctx, m.buildInsertOrUpdate(toStructSlice(target)))
@@ -45,37 +45,37 @@ func (m *Mutation) ApplyInsertOrUpdate(ctx context.Context, client *spanner.Clie
 // You can pass either a struct or a slice of structs to target.
 // If you pass a slice of structs, this method will build a mutation for each struct.
 // This method requires spanner.ReadWriteTransaction, and will call spanner.ReadWriteTransaction.BufferWrite to save the mutation to transaction.
-func (m *Mutation) InsertOrUpdateColumns(tx *spanner.ReadWriteTransaction, columns []string, target interface{}) error {
+func (m *Mutation) InsertOrUpdateColumns(tx *spanner.ReadWriteTransaction, columns []string, target any) error {
 	isStruct, err := validateStructOrStructSliceType(target)
 	if err != nil {
 		return err
 	}
 	if isStruct {
-		return errors.WithStack(tx.BufferWrite(m.buildInsertOrUpdateWithColumns(columns, []interface{}{target})))
+		return errors.WithStack(tx.BufferWrite(m.buildInsertOrUpdateWithColumns(columns, []any{target})))
 	}
 	return errors.WithStack(tx.BufferWrite(m.buildInsertOrUpdateWithColumns(columns, toStructSlice(target))))
 }
 
 // ApplyInsertOrUpdateColumns is basically same as InsertOrUpdateColumns, but it doesn't require transaction.
 // This method directly calls mutation API without transaction by calling spanner.Client.Apply method.
-func (m *Mutation) ApplyInsertOrUpdateColumns(ctx context.Context, client *spanner.Client, columns []string, target interface{}) (time.Time, error) {
+func (m *Mutation) ApplyInsertOrUpdateColumns(ctx context.Context, client *spanner.Client, columns []string, target any) (time.Time, error) {
 	isStruct, err := validateStructOrStructSliceType(target)
 	if err != nil {
 		return time.Time{}, err
 	}
 	if isStruct {
-		t, err := client.Apply(ctx, m.buildInsertOrUpdateWithColumns(columns, []interface{}{target}))
+		t, err := client.Apply(ctx, m.buildInsertOrUpdateWithColumns(columns, []any{target}))
 		return t, errors.WithStack(err)
 	}
 	t, err := client.Apply(ctx, m.buildInsertOrUpdateWithColumns(columns, toStructSlice(target)))
 	return t, errors.WithStack(err)
 }
 
-func (m *Mutation) buildInsertOrUpdate(targets []interface{}) []*spanner.Mutation {
+func (m *Mutation) buildInsertOrUpdate(targets []any) []*spanner.Mutation {
 	var ms []*spanner.Mutation
 	for _, target := range targets {
 		var columns []string
-		var values []interface{}
+		var values []any
 		for _, field := range toFields(target) {
 			columns = append(columns, field.name)
 			values = append(values, field.value)
@@ -86,14 +86,14 @@ func (m *Mutation) buildInsertOrUpdate(targets []interface{}) []*spanner.Mutatio
 	return ms
 }
 
-func (m *Mutation) buildInsertOrUpdateWithColumns(columns []string, targets []interface{}) []*spanner.Mutation {
+func (m *Mutation) buildInsertOrUpdateWithColumns(columns []string, targets []any) []*spanner.Mutation {
 	var ms []*spanner.Mutation
 	for _, target := range targets {
 		fieldNameField := map[string]field{}
 		for _, f := range toFields(target) {
 			fieldNameField[strings.ToLower(f.name)] = f
 		}
-		var values []interface{}
+		var values []any
 		for _, c := range columns {
 			values = append(values, fieldNameField[c])
 		}

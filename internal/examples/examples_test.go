@@ -1,19 +1,20 @@
 package examples
 
 import (
+	"context"
+	"fmt"
+	"os"
+	"testing"
+
 	"cloud.google.com/go/spanner"
 	database "cloud.google.com/go/spanner/admin/database/apiv1"
 	instance "cloud.google.com/go/spanner/admin/instance/apiv1"
-	"context"
-	"fmt"
 	"github.com/kanjih/go-spnr"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
 	databasepb "google.golang.org/genproto/googleapis/spanner/admin/database/v1"
 	instancepb "google.golang.org/genproto/googleapis/spanner/admin/instance/v1"
 	"gotest.tools/assert"
-	"os"
-	"testing"
 )
 
 const (
@@ -46,7 +47,7 @@ func TestExample(t *testing.T) {
 
 	var singers []Singer
 	query := "select * from Singers where SingerId=@singerId"
-	params := map[string]interface{}{"singerId": "a"}
+	params := map[string]any{"singerId": "a"}
 	err = singerStore.Reader(ctx, client.Single()).Query(query, params, &singers)
 	assert.NilError(t, err)
 	assert.Equal(t, 1, len(singers))
@@ -121,7 +122,7 @@ func TestSelectRecordsUsingQuery(t *testing.T) {
 
 	var fetched Singer
 	query := "select * from `Singers` where SingerId=@singerId"
-	params := map[string]interface{}{"singerId": "a"}
+	params := map[string]any{"singerId": "a"}
 	err = singerStore.Reader(ctx, client.Single()).QueryOne(query, params, &fetched)
 	assert.NilError(t, err)
 	assert.Equal(t, *singer, fetched)
