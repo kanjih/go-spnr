@@ -1,18 +1,19 @@
 package build
 
 import (
-	database "cloud.google.com/go/spanner/admin/database/apiv1"
-	instance "cloud.google.com/go/spanner/admin/instance/apiv1"
 	"context"
 	"fmt"
+	"io/ioutil"
+	"os"
+	"testing"
+
+	database "cloud.google.com/go/spanner/admin/database/apiv1"
+	instance "cloud.google.com/go/spanner/admin/instance/apiv1"
 	"github.com/stretchr/testify/assert"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
 	databasepb "google.golang.org/genproto/googleapis/spanner/admin/database/v1"
 	instancepb "google.golang.org/genproto/googleapis/spanner/admin/instance/v1"
-	"io/ioutil"
-	"os"
-	"testing"
 )
 
 const (
@@ -43,7 +44,7 @@ func TestMain(m *testing.M) {
 	ctx := context.Background()
 	c, err := initSpannerContainer(ctx)
 	if c != nil {
-		defer c.Terminate(ctx)
+		defer c.Terminate(ctx) //nolint:errcheck
 	}
 	if err != nil {
 		panic(err)

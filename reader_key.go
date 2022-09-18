@@ -1,9 +1,11 @@
 package spnr
 
 import (
-	"cloud.google.com/go/spanner"
-	"google.golang.org/api/iterator"
 	"reflect"
+
+	"cloud.google.com/go/spanner"
+	"github.com/pkg/errors"
+	"google.golang.org/api/iterator"
 )
 
 // FindOne fetches a record by specified primary key, and map the record into the passed pointer of struct.
@@ -11,14 +13,14 @@ func (r *Reader) FindOne(key spanner.Key, target interface{}) error {
 	if err := validateStructType(target); err != nil {
 		return err
 	}
-	r.log(readLogTemplate, "table:"+r.table, key)
+	r.logf(readLogTemplate, "table:"+r.table, key)
 
 	row, err := r.tx.ReadRow(r.ctx, r.table, key, toColumnNames(reflect.ValueOf(target).Elem().Type()))
 	if err != nil {
 		if isNotFound(err) {
 			return ErrNotFound
 		}
-		return withStack(err)
+		return errors.WithStack(err)
 	}
 	return row.ToStruct(target)
 }
@@ -38,15 +40,15 @@ func (r *Reader) FindAll(keys spanner.KeySet, target interface{}) error {
 	defer rows.Stop()
 	for {
 		row, err := rows.Next()
-		if err == iterator.Done {
+		if errors.Is(err, iterator.Done) {
 			break
 		}
 		if err != nil {
-			return withStack(err)
+			return errors.WithStack(err)
 		}
 		e := reflect.New(innerType).Elem()
 		if err := row.ToStruct(e.Addr().Interface()); err != nil {
-			return withStack(err)
+			return errors.WithStack(err)
 		}
 		slice.Set(reflect.Append(slice, e))
 	}
@@ -64,15 +66,15 @@ So the type of passed value to map should be compatible to this method.
 For example if you fetch an INT64 column from spanner, you need to map this value to int64, not int.
 */
 func (r *Reader) GetColumn(key spanner.Key, column string, target interface{}) error {
-	r.log(readLogTemplate, "table:"+r.table, key)
+	r.logf(readLogTemplate, "table:"+r.table, key)
 	row, err := r.tx.ReadRow(r.ctx, r.table, key, []string{column})
 	if err != nil {
 		if isNotFound(err) {
 			return ErrNotFound
 		}
-		return withStack(err)
+		return errors.WithStack(err)
 	}
-	return withStack(row.Columns(target))
+	return errors.WithStack(row.Columns(target))
 }
 
 // GetColumn fetches the specified column for the records that matches specified set of primary keys,
@@ -82,7 +84,7 @@ func (r *Reader) GetColumnAll(keys spanner.KeySet, column string, target interfa
 	if err := validateSliceType(target); err != nil {
 		return err
 	}
-	r.log(readLogTemplate, "table:"+r.table, keys)
+	r.logf(readLogTemplate, "table:"+r.table, keys)
 	slice := reflect.ValueOf(target).Elem()
 	innerType := slice.Type().Elem()
 
@@ -90,15 +92,15 @@ func (r *Reader) GetColumnAll(keys spanner.KeySet, column string, target interfa
 	defer rows.Stop()
 	for {
 		row, err := rows.Next()
-		if err == iterator.Done {
+		if errors.Is(err, iterator.Done) {
 			break
 		}
 		if err != nil {
-			return withStack(err)
+			return errors.WithStack(err)
 		}
 		e := reflect.New(innerType).Elem()
 		if err := row.Columns(e.Addr().Interface()); err != nil {
-			return withStack(err)
+			return errors.WithStack(err)
 		}
 		slice.Set(reflect.Append(slice, e))
 	}

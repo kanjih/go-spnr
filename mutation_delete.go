@@ -1,9 +1,11 @@
 package spnr
 
 import (
-	"cloud.google.com/go/spanner"
 	"context"
 	"time"
+
+	"cloud.google.com/go/spanner"
+	"github.com/pkg/errors"
 )
 
 // Delete build and execute delete operation using mutation API.
@@ -16,9 +18,9 @@ func (m *Mutation) Delete(tx *spanner.ReadWriteTransaction, target interface{}) 
 		return err
 	}
 	if isStruct {
-		return withStack(tx.BufferWrite(m.buildDelete([]interface{}{target})))
+		return errors.WithStack(tx.BufferWrite(m.buildDelete([]interface{}{target})))
 	}
-	return withStack(tx.BufferWrite(m.buildDelete(toStructSlice(target))))
+	return errors.WithStack(tx.BufferWrite(m.buildDelete(toStructSlice(target))))
 }
 
 // ApplyDelete is basically same as Delete, but it doesn't require transaction.
@@ -30,10 +32,10 @@ func (m *Mutation) ApplyDelete(ctx context.Context, client *spanner.Client, targ
 	}
 	if isStruct {
 		t, err := client.Apply(ctx, m.buildDelete([]interface{}{target}))
-		return t, withStack(err)
+		return t, errors.WithStack(err)
 	}
 	t, err := client.Apply(ctx, m.buildDelete(toStructSlice(target)))
-	return t, withStack(err)
+	return t, errors.WithStack(err)
 }
 
 func (m *Mutation) buildDelete(targets []interface{}) []*spanner.Mutation {
@@ -44,7 +46,7 @@ func (m *Mutation) buildDelete(targets []interface{}) []*spanner.Mutation {
 			pks = append(pks, pk.value)
 		}
 		ms = append(ms, spanner.Delete(m.table, pks))
-		m.log("Deleting from %s, key=%+v", m.table, pks)
+		m.logf("Deleting from %s, key=%+v", m.table, pks)
 	}
 	return ms
 }

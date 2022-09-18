@@ -1,10 +1,11 @@
 package spnr
 
 import (
+	"reflect"
+
 	"cloud.google.com/go/spanner"
 	"github.com/pkg/errors"
 	"google.golang.org/api/iterator"
-	"reflect"
 )
 
 /*
@@ -22,26 +23,26 @@ func (r *Reader) QueryOne(sql string, params map[string]interface{}, target inte
 	if err := validateStructType(target); err != nil {
 		return err
 	}
-	r.log(readLogTemplate, "sql:"+sql, params)
+	r.logf(readLogTemplate, "sql:"+sql, params)
 
 	iter := r.tx.Query(r.ctx, spanner.Statement{SQL: sql, Params: params})
 	defer iter.Stop()
 
 	row, err := iter.Next()
-	if err == iterator.Done {
+	if errors.Is(err, iterator.Done) {
 		return ErrNotFound
 	}
 	if err != nil {
-		return withStack(err)
+		return errors.WithStack(err)
 	}
 
 	err = row.ToStruct(target)
 	if err != nil {
-		return withStack(err)
+		return errors.WithStack(err)
 	}
 
 	_, err = iter.Next()
-	if err == iterator.Done {
+	if errors.Is(err, iterator.Done) {
 		return nil
 	} else {
 		return ErrMoreThanOneRecordFound
@@ -53,7 +54,7 @@ func (r *Reader) Query(sql string, params map[string]interface{}, target interfa
 	if err := validateStructSliceType(target); err != nil {
 		return err
 	}
-	r.log(readLogTemplate, "sql:"+sql, params)
+	r.logf(readLogTemplate, "sql:"+sql, params)
 	slice := reflect.ValueOf(target).Elem()
 	innerType := slice.Type().Elem()
 
@@ -62,15 +63,15 @@ func (r *Reader) Query(sql string, params map[string]interface{}, target interfa
 
 	for {
 		row, err := iter.Next()
-		if err == iterator.Done {
+		if errors.Is(err, iterator.Done) {
 			break
 		}
 		if err != nil {
-			return withStack(err)
+			return errors.WithStack(err)
 		}
 		e := reflect.New(innerType).Elem()
 		if err := row.ToStruct(e.Addr().Interface()); err != nil {
-			return withStack(err)
+			return errors.WithStack(err)
 		}
 		slice.Set(reflect.Append(slice, e))
 	}
@@ -90,7 +91,7 @@ Example:
 	QueryValue("select count(*) as cnt from Singers", nil, &cnt)
 */
 func (r *Reader) QueryValue(sql string, params map[string]interface{}, target interface{}) error {
-	r.log(readLogTemplate, "sql:"+sql, params)
+	r.logf(readLogTemplate, "sql:"+sql, params)
 	iter := r.tx.Query(r.ctx, spanner.Statement{SQL: sql, Params: params})
 	defer iter.Stop()
 
@@ -99,7 +100,7 @@ func (r *Reader) QueryValue(sql string, params map[string]interface{}, target in
 		if errors.Is(err, iterator.Done) {
 			return ErrNotFound
 		}
-		return withStack(err)
+		return errors.WithStack(err)
 	}
 	if row == nil {
 		return ErrNotFound
@@ -107,11 +108,11 @@ func (r *Reader) QueryValue(sql string, params map[string]interface{}, target in
 
 	err = row.Columns(target)
 	if err != nil {
-		return withStack(err)
+		return errors.WithStack(err)
 	}
 
 	_, err = iter.Next()
-	if err == iterator.Done {
+	if errors.Is(err, iterator.Done) {
 		return nil
 	} else {
 		return ErrMoreThanOneRecordFound
@@ -129,7 +130,7 @@ func (r *Reader) QueryValues(sql string, params map[string]interface{}, target i
 	if err := validateSliceType(target); err != nil {
 		return err
 	}
-	r.log(readLogTemplate, "sql:"+sql, params)
+	r.logf(readLogTemplate, "sql:"+sql, params)
 	slice := reflect.ValueOf(target).Elem()
 	innerType := slice.Type().Elem()
 
@@ -138,15 +139,15 @@ func (r *Reader) QueryValues(sql string, params map[string]interface{}, target i
 
 	for {
 		row, err := iter.Next()
-		if err == iterator.Done {
+		if errors.Is(err, iterator.Done) {
 			break
 		}
 		if err != nil {
-			return withStack(err)
+			return errors.WithStack(err)
 		}
 		e := reflect.New(innerType).Elem()
 		if err := row.Columns(e.Addr().Interface()); err != nil {
-			return withStack(err)
+			return errors.WithStack(err)
 		}
 		slice.Set(reflect.Append(slice, e))
 	}

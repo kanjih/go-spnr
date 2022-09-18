@@ -1,12 +1,13 @@
 package spnr
 
 import (
-	"cloud.google.com/go/spanner"
 	"context"
-	"github.com/pkg/errors"
-	"google.golang.org/grpc/codes"
 	"log"
 	"reflect"
+
+	"cloud.google.com/go/spanner"
+	"github.com/pkg/errors"
+	"google.golang.org/grpc/codes"
 )
 
 var (
@@ -34,7 +35,7 @@ type Reader struct {
 	logEnabled bool
 }
 
-func (r *Reader) log(format string, v ...interface{}) {
+func (r *Reader) logf(format string, v ...interface{}) {
 	if !r.logEnabled {
 		return
 	}
@@ -55,6 +56,7 @@ func toColumnNames(val reflect.Type) []string {
 }
 
 func isNotFound(err error) bool {
-	spannerErr, ok := err.(*spanner.Error)
-	return ok && spanner.ErrCode(spannerErr) == codes.NotFound
+	errSpanner := &spanner.Error{}
+	ok := errors.As(err, &errSpanner)
+	return ok && spanner.ErrCode(errSpanner) == codes.NotFound
 }

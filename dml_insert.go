@@ -1,11 +1,13 @@
 package spnr
 
 import (
-	"cloud.google.com/go/spanner"
 	"context"
 	"fmt"
 	"reflect"
 	"strings"
+
+	"cloud.google.com/go/spanner"
+	"github.com/pkg/errors"
 )
 
 // Insert build and execute insert statement from the passed struct.
@@ -19,10 +21,10 @@ func (d *DML) Insert(ctx context.Context, tx *spanner.ReadWriteTransaction, targ
 	}
 	if isStruct {
 		rowCount, err := tx.Update(ctx, *d.buildInsertStmt(target))
-		return rowCount, withStack(err)
+		return rowCount, errors.WithStack(err)
 	} else {
 		rowCount, err := tx.Update(ctx, *d.buildInsertAllStmt(target))
-		return rowCount, withStack(err)
+		return rowCount, errors.WithStack(err)
 	}
 }
 
