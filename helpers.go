@@ -2,10 +2,11 @@ package spnr
 
 import (
 	"fmt"
-	"github.com/pkg/errors"
 	"reflect"
 	"sort"
 	"strings"
+
+	"github.com/pkg/errors"
 )
 
 var errNotPointer = errors.New("final argument must be passed as pointer")
@@ -131,11 +132,4 @@ func toStructSlice(target interface{}) []interface{} {
 		}
 	}
 	return parsed
-}
-
-func withStack(err error) error {
-	if err == nil {
-		return nil
-	}
-	return errors.WithStack(err)
 }

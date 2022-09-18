@@ -1,18 +1,18 @@
 package build
 
 import (
-	database "cloud.google.com/go/spanner/admin/database/apiv1"
-	instance "cloud.google.com/go/spanner/admin/instance/apiv1"
 	"context"
 	"fmt"
+	"os"
+	"testing"
+
+	database "cloud.google.com/go/spanner/admin/database/apiv1"
+	instance "cloud.google.com/go/spanner/admin/instance/apiv1"
 	"github.com/stretchr/testify/assert"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
 	databasepb "google.golang.org/genproto/googleapis/spanner/admin/database/v1"
 	instancepb "google.golang.org/genproto/googleapis/spanner/admin/instance/v1"
-	"io/ioutil"
-	"os"
-	"testing"
 )
 
 const (
@@ -31,10 +31,10 @@ var (
 func TestGenerateCode(t *testing.T) {
 	codes, err := generateCode(context.Background(), projectName, instanceName, databaseName, "entity_test")
 	assert.Nil(t, err)
-	b, err := ioutil.ReadFile("testdata/test1.go")
+	b, err := os.ReadFile("testdata/test1.go")
 	assert.Nil(t, err)
 	assert.Equal(t, string(b), string(codes["Test1"]))
-	b, err = ioutil.ReadFile("testdata/test2.go")
+	b, err = os.ReadFile("testdata/test2.go")
 	assert.Nil(t, err)
 	assert.Equal(t, string(b), string(codes["Test2"]))
 }
@@ -43,7 +43,7 @@ func TestMain(m *testing.M) {
 	ctx := context.Background()
 	c, err := initSpannerContainer(ctx)
 	if c != nil {
-		defer c.Terminate(ctx)
+		defer c.Terminate(ctx) //nolint:errcheck
 	}
 	if err != nil {
 		panic(err)
@@ -109,11 +109,11 @@ func initDatabase(ctx context.Context) (err error) {
 		return err
 	}
 
-	b1, err := ioutil.ReadFile("testdata/test1.sql")
+	b1, err := os.ReadFile("testdata/test1.sql")
 	if err != nil {
 		return err
 	}
-	b2, err := ioutil.ReadFile("testdata/test2.sql")
+	b2, err := os.ReadFile("testdata/test2.sql")
 	if err != nil {
 		return err
 	}

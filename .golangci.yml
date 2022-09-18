@@ -35,8 +35,6 @@ linters-settings:
   gosimple:
     go: "1.16.6"
     checks: ["all"]
-  govet:
-    check-shadowing: true
   unused:
     go: "1.16.6"
   errorlint:

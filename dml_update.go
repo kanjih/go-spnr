@@ -1,11 +1,13 @@
 package spnr
 
 import (
-	"cloud.google.com/go/spanner"
 	"context"
 	"fmt"
 	"reflect"
 	"strings"
+
+	"cloud.google.com/go/spanner"
+	"github.com/pkg/errors"
 )
 
 // Update build and execute update statement from the passed struct.
@@ -18,10 +20,10 @@ func (d *DML) Update(ctx context.Context, tx *spanner.ReadWriteTransaction, targ
 	}
 	if isStruct {
 		rowCount, err := tx.Update(ctx, *d.buildUpdateStmt(target, nil))
-		return rowCount, withStack(err)
+		return rowCount, errors.WithStack(err)
 	} else {
 		rowCount, err := d.updateAll(ctx, tx, target)
-		return rowCount, withStack(err)
+		return rowCount, errors.WithStack(err)
 	}
 }
 
@@ -48,24 +50,11 @@ func (d *DML) UpdateColumns(ctx context.Context, tx *spanner.ReadWriteTransactio
 	}
 	if isStruct {
 		rowCount, err := tx.Update(ctx, *d.buildUpdateStmt(target, columns))
-		return rowCount, withStack(err)
+		return rowCount, errors.WithStack(err)
 	} else {
 		rowCount, err := d.updateAll(ctx, tx, target)
-		return rowCount, withStack(err)
+		return rowCount, errors.WithStack(err)
 	}
-}
-
-func (d *DML) updateColumnsAll(ctx context.Context, tx *spanner.ReadWriteTransaction, columns []string, target interface{}) (rowCount int64, err error) {
-	slice := reflect.ValueOf(target).Elem()
-	for i := 0; i < slice.Len(); i++ {
-		e := slice.Index(i)
-		cnt, err := tx.Update(ctx, *d.buildUpdateStmt(e.Addr().Interface(), columns))
-		if err != nil {
-			return 0, err
-		}
-		rowCount += cnt
-	}
-	return rowCount, nil
 }
 
 func (d *DML) buildUpdateStmt(target interface{}, columns []string) *spanner.Statement {

@@ -1,11 +1,13 @@
 package spnr
 
 import (
-	"cloud.google.com/go/spanner"
 	"context"
 	"fmt"
 	"reflect"
 	"strings"
+
+	"cloud.google.com/go/spanner"
+	"github.com/pkg/errors"
 )
 
 // Delete build and execute delete statement from the passed struct.
@@ -19,10 +21,10 @@ func (d *DML) Delete(ctx context.Context, tx *spanner.ReadWriteTransaction, targ
 	}
 	if isStruct {
 		rowCount, err = tx.Update(ctx, *d.buildDeleteStmt(target))
-		return rowCount, withStack(err)
+		return rowCount, errors.WithStack(err)
 	} else {
 		rowCount, err := tx.Update(ctx, *d.buildDeleteAllStmt(target))
-		return rowCount, withStack(err)
+		return rowCount, errors.WithStack(err)
 	}
 }
 

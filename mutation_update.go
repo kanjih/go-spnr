@@ -1,10 +1,12 @@
 package spnr
 
 import (
-	"cloud.google.com/go/spanner"
 	"context"
 	"strings"
 	"time"
+
+	"cloud.google.com/go/spanner"
+	"github.com/pkg/errors"
 )
 
 // Update build and execute update operation using mutation API.
@@ -18,9 +20,9 @@ func (m *Mutation) Update(tx *spanner.ReadWriteTransaction, target interface{}) 
 		return err
 	}
 	if isStruct {
-		return withStack(tx.BufferWrite(m.buildUpdate([]interface{}{target})))
+		return errors.WithStack(tx.BufferWrite(m.buildUpdate([]interface{}{target})))
 	}
-	return withStack(tx.BufferWrite(m.buildUpdate(toStructSlice(target))))
+	return errors.WithStack(tx.BufferWrite(m.buildUpdate(toStructSlice(target))))
 }
 
 // ApplyUpdate is basically same as Update, but it doesn't require transaction.
@@ -33,10 +35,10 @@ func (m *Mutation) ApplyUpdate(ctx context.Context, client *spanner.Client, targ
 	}
 	if isStruct {
 		t, err := client.Apply(ctx, m.buildUpdate([]interface{}{target}))
-		return t, withStack(err)
+		return t, errors.WithStack(err)
 	}
 	t, err := client.Apply(ctx, m.buildUpdate(toStructSlice(target)))
-	return t, withStack(err)
+	return t, errors.WithStack(err)
 }
 
 // UpdateColumns build and execute update operation for specified columns using mutation API.
@@ -49,9 +51,9 @@ func (m *Mutation) UpdateColumns(tx *spanner.ReadWriteTransaction, columns []str
 		return err
 	}
 	if isStruct {
-		return withStack(tx.BufferWrite(m.buildUpdateWithColumns([]interface{}{target}, columns)))
+		return errors.WithStack(tx.BufferWrite(m.buildUpdateWithColumns([]interface{}{target}, columns)))
 	}
-	return withStack(tx.BufferWrite(m.buildUpdateWithColumns(toStructSlice(target), columns)))
+	return errors.WithStack(tx.BufferWrite(m.buildUpdateWithColumns(toStructSlice(target), columns)))
 }
 
 // ApplyUpdateColumns is basically same as UpdateColumns, but it doesn't require transaction.
@@ -63,10 +65,10 @@ func (m *Mutation) ApplyUpdateColumns(ctx context.Context, client *spanner.Clien
 	}
 	if isStruct {
 		t, err := client.Apply(ctx, m.buildUpdateWithColumns([]interface{}{target}, columns))
-		return t, withStack(err)
+		return t, errors.WithStack(err)
 	}
 	t, err := client.Apply(ctx, m.buildUpdateWithColumns(toStructSlice(target), columns))
-	return t, withStack(err)
+	return t, errors.WithStack(err)
 }
 
 func (m *Mutation) buildUpdate(targets []interface{}) []*spanner.Mutation {
@@ -78,7 +80,7 @@ func (m *Mutation) buildUpdate(targets []interface{}) []*spanner.Mutation {
 			columns = append(columns, field.name)
 			values = append(values, field.value)
 		}
-		m.log("Update %s, columns=%+v, values=%+v", m.table, columns, values)
+		m.logf("Update %s, columns=%+v, values=%+v", m.table, columns, values)
 		ms = append(ms, spanner.Update(m.table, columns, values))
 	}
 	return ms
@@ -87,15 +89,15 @@ func (m *Mutation) buildUpdate(targets []interface{}) []*spanner.Mutation {
 func (m *Mutation) buildUpdateWithColumns(targets []interface{}, columns []string) []*spanner.Mutation {
 	var ms []*spanner.Mutation
 	for _, target := range targets {
-		fieldNameField := map[string]field{}
+		fieldNameToField := map[string]field{}
 		for _, f := range toFields(target) {
-			fieldNameField[strings.ToLower(f.name)] = f
+			fieldNameToField[strings.ToLower(f.name)] = f
 		}
 		var values []interface{}
 		for _, c := range columns {
-			values = append(values, fieldNameField[c])
+			values = append(values, fieldNameToField[strings.ToLower(c)].value)
 		}
-		m.log("Update %s, columns=%+v, values=%+v", m.table, columns, values)
+		m.logf("Update %s, columns=%+v, values=%+v", m.table, columns, values)
 		ms = append(ms, spanner.Update(m.table, columns, values))
 	}
 	return ms

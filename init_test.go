@@ -1,21 +1,21 @@
 package spnr
 
 import (
-	"cloud.google.com/go/civil"
-	"cloud.google.com/go/spanner"
-	database "cloud.google.com/go/spanner/admin/database/apiv1"
-	instance "cloud.google.com/go/spanner/admin/instance/apiv1"
 	"context"
 	"fmt"
-	"github.com/testcontainers/testcontainers-go"
-	"github.com/testcontainers/testcontainers-go/wait"
-	databasepb "google.golang.org/genproto/googleapis/spanner/admin/database/v1"
-	instancepb "google.golang.org/genproto/googleapis/spanner/admin/instance/v1"
-	"io/ioutil"
 	"math/big"
 	"os"
 	"testing"
 	"time"
+
+	"cloud.google.com/go/civil"
+	"cloud.google.com/go/spanner"
+	database "cloud.google.com/go/spanner/admin/database/apiv1"
+	instance "cloud.google.com/go/spanner/admin/instance/apiv1"
+	"github.com/testcontainers/testcontainers-go"
+	"github.com/testcontainers/testcontainers-go/wait"
+	databasepb "google.golang.org/genproto/googleapis/spanner/admin/database/v1"
+	instancepb "google.golang.org/genproto/googleapis/spanner/admin/instance/v1"
 )
 
 const (
@@ -113,7 +113,7 @@ func TestMain(m *testing.M) {
 	ctx := context.Background()
 	c, err := initSpannerContainer(ctx)
 	if c != nil {
-		defer c.Terminate(ctx)
+		defer c.Terminate(ctx) //nolint:errcheck
 	}
 	if err != nil {
 		panic(err)
@@ -183,7 +183,7 @@ func initDatabase(ctx context.Context) (err error) {
 		return err
 	}
 
-	b, err := ioutil.ReadFile("testdata/test.sql")
+	b, err := os.ReadFile("testdata/test.sql")
 	if err != nil {
 		return err
 	}
