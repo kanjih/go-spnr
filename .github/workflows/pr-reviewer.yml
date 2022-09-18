@@ -2,7 +2,7 @@ name: PR-Reviewer
 
 on:
   pull_request:
-    branches: [ master ]
+    branches: [master]
 
 jobs:
   setup:
@@ -26,7 +26,7 @@ jobs:
       - name: prepare test
         run: go get github.com/docker/docker/pkg/system@v20.10.7+incompatible
       - name: test
-        run: go test ./... 
+        run: go test ./...
   formatting:
     needs: build
     runs-on: ubuntu-latest
@@ -56,8 +56,23 @@ jobs:
       - name: Code Review by golangci-lint
         uses: reviewdog/action-golangci-lint@v2
         with:
-          golangci_lint_flags: "--config=.golangci.yml"
+          golangci_lint_flags: '--config=.golangci.yml'
           filter_mode: nofilter
           cache: false
           level: warning
           reporter: github-pr-review
+  check_dependency_vulnerabilities:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Go 1.16.6
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.16.6
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+      - name: Write dependencies to go.list
+        run: go list -json -m all > go.list
+      - name: Run Nancy
+        uses: sonatype-nexus-community/nancy-github-action@main
