@@ -6,6 +6,7 @@ import (
 	"reflect"
 
 	"cloud.google.com/go/spanner"
+	"github.com/googleapis/gax-go/v2/apierror"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc/codes"
 )
@@ -56,7 +57,7 @@ func toColumnNames(val reflect.Type) []string {
 }
 
 func isNotFound(err error) bool {
-	errSpanner := &spanner.Error{}
-	ok := errors.As(err, &errSpanner)
-	return ok && spanner.ErrCode(errSpanner) == codes.NotFound
+	var apiErr *apierror.APIError
+	return errors.As(err, &apiErr) &&
+		apiErr.GRPCStatus().Code() == codes.NotFound
 }
