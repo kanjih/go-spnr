@@ -3,7 +3,6 @@ package spnr
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"math/big"
 	"os"
 	"testing"
@@ -184,7 +183,7 @@ func initDatabase(ctx context.Context) (err error) {
 		return err
 	}
 
-	b, err := ioutil.ReadFile("testdata/test.sql")
+	b, err := os.ReadFile("testdata/test.sql")
 	if err != nil {
 		return err
 	}

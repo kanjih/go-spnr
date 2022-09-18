@@ -3,7 +3,7 @@ package build
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io/os"
 	"os"
 	"testing"
 
@@ -32,10 +32,10 @@ var (
 func TestGenerateCode(t *testing.T) {
 	codes, err := generateCode(context.Background(), projectName, instanceName, databaseName, "entity_test")
 	assert.Nil(t, err)
-	b, err := ioutil.ReadFile("testdata/test1.go")
+	b, err := os.ReadFile("testdata/test1.go")
 	assert.Nil(t, err)
 	assert.Equal(t, string(b), string(codes["Test1"]))
-	b, err = ioutil.ReadFile("testdata/test2.go")
+	b, err = os.ReadFile("testdata/test2.go")
 	assert.Nil(t, err)
 	assert.Equal(t, string(b), string(codes["Test2"]))
 }
@@ -110,11 +110,11 @@ func initDatabase(ctx context.Context) (err error) {
 		return err
 	}
 
-	b1, err := ioutil.ReadFile("testdata/test1.sql")
+	b1, err := os.ReadFile("testdata/test1.sql")
 	if err != nil {
 		return err
 	}
-	b2, err := ioutil.ReadFile("testdata/test2.sql")
+	b2, err := os.ReadFile("testdata/test2.sql")
 	if err != nil {
 		return err
 	}
