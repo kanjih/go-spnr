@@ -1,4 +1,9 @@
+# IntelliJ
 .idea/
 go-spnr.iml
 
+# vscode
+.vscode/
+
+# Go
 .go-version
