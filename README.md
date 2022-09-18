@@ -2,7 +2,7 @@
 
 ORM for Cloud Spanner to boost your productivity 🚀
 
-[![GoDev][godev-image]][godev-url] 
+[![Go Reference](https://pkg.go.dev/badge/github.com/kanjih/go-spnr/v2.svg)](https://pkg.go.dev/github.com/kanjih/go-spnr/v2)
 [![Actions Status](https://github.com/kanjih/go-spnr/workflows/test/badge.svg?branch=main)](https://github.com/kanjih/go-spnr/actions)
 
 
