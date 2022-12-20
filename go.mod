@@ -7,7 +7,7 @@ require (
 	cloud.google.com/go/spanner v1.39.0
 	github.com/googleapis/gax-go/v2 v2.5.1
 	github.com/iancoleman/strcase v0.2.0
-	github.com/kanjih/go-spnr v0.1.1
+	github.com/kanjih/go-spnr/v2 v2.0.0
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.8.1
 	github.com/testcontainers/testcontainers-go v0.14.0
