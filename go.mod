@@ -3,7 +3,7 @@ module github.com/kanjih/go-spnr/v2
 go 1.19
 
 require (
-	cloud.google.com/go v0.107.0
+	cloud.google.com/go v0.108.0
 	cloud.google.com/go/spanner v1.42.0
 	github.com/googleapis/gax-go/v2 v2.7.0
 	github.com/iancoleman/strcase v0.2.0
