@@ -14,7 +14,7 @@ require (
 	github.com/urfave/cli/v2 v2.23.7
 	google.golang.org/api v0.108.0
 	google.golang.org/genproto v0.0.0-20230119192704-9d59e20e5cd1
-	google.golang.org/grpc v1.52.0
+	google.golang.org/grpc v1.52.3
 	gotest.tools v2.2.0+incompatible
 )
 
