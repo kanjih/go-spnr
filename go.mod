@@ -11,7 +11,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.8.1
 	github.com/testcontainers/testcontainers-go v0.14.0
-	github.com/urfave/cli/v2 v2.23.7
+	github.com/urfave/cli/v2 v2.25.1
 	google.golang.org/api v0.108.0
 	google.golang.org/genproto v0.0.0-20230119192704-9d59e20e5cd1
 	google.golang.org/grpc v1.52.3
