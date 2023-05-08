@@ -233,7 +233,7 @@ func useSingerStore(ctx context.Context, client *spanner.Client) {
 Tired to write struct code to map records for every table?<br/>
 Don't worry! spnr provides code generation 🚀
 ```sh
-go install github.com/kanjih/go-spnr/cmd/spnr
+go install github.com/kanjih/go-spnr/cmd/spnr@latest
 spnr build -p {PROJECT_ID} -i {INSTANCE_ID} -d {DATABASE_ID} -n {PACKAGE_NAME} -o {OUTPUT_DIR}
 ```
 
